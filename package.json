@@ -1,0 +1,23 @@
+{
+  "name": "test-recorder",
+  "version": "0.0.1",
+  "description": "to record integration tests for different frameworks.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QuantumInformation/test-recorder.git"
+  },
+  "keywords": [
+    "test",
+    "recording"
+  ],
+  "author": "nkatsikanis@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/QuantumInformation/test-recorder/issues"
+  },
+  "homepage": "https://github.com/QuantumInformation/test-recorder#readme"
+}

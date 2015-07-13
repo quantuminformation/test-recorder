@@ -1,11 +1,13 @@
-# angular-e2e-test-recorder
-Records e2e tests for both angular and angular 2.
+# test-recorder
+This is an ambitious project that aims to record integration tests for different frameworks.
 
-This records the ways you interact with an angular application, and then generates the code to playback these actions and 
- test results in an e2e test with protractor. The idea is to save you time writing these tests by hand.
+It currently supports Emberjs and am working on angular version
+
+This records the ways you interact with your application, and then generates the code to playback these actions inside a test runner like 
+qunit or protractor. The idea is to save you time writing these tests by hand.
  
-You should only add this script to your app when your app behaves as
-expected (happy flow) as then you will have the tests generated for expected behaviour
+You should only add the relevant script to your app when your app behaves as
+expected (happy flow) as then you will have the tests generated for expected behaviour.
 
 ###Current UI interactions that are recorded for acceptance tests:
 
@@ -13,8 +15,31 @@ expected (happy flow) as then you will have the tests generated for expected beh
 * Record any changes to route
 * Changes in DOM additions/removals, only items with ID's are recorded and that don't have the doNotRecord css class.
 
+To use this, simply include this line of code someone in your app, I recommend in your `app.js`:
+
+```js
+import main from 'ember-cli-test-recorder/main';// jshint ignore:line
 ```
+Note: we use jshint ignore:line as we don't actually do anything with the main object, it sets everything up by itself
+
+
+If an element doesn't have an id then a dom path selector will be generated to click on this buttonin a test, ie
+```js
+click("html>body>div>div:eq(0)>button");
+andThen(function () {
+ equal(find("#foo").length, 0, "foo removed AFTER user [INSERT REASON]");
+});
+
+
 If you don't want an element to be recorded, and any of its children add this class to it `doNotRecord`
+
+## Roadmap
+* Allow selects to be automated
+* Allow more complex click actions like the steps to click on inputs like select2 to be recorded
+* Ignore clicks on ember elements with no effect
+* Get mutations to work with async effects
+* Separate out recording to its own library and just use ember adapters for code test style
+
 
 ##TIPS
 
