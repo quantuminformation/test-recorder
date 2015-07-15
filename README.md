@@ -9,6 +9,13 @@ qunit or protractor. The idea is to save you time writing these tests by hand.
 You should only add the relevant script to your app when your app behaves as
 expected (happy flow) as then you will have the tests generated for expected behaviour.
 
+#Demo's
+
+##Angular
+
+The protractor test app has been copied to demo/protractorTestApp
+You can run this
+
 ###Current UI interactions that are recorded for acceptance tests:
 
 * Button clicks, they also generate andThen code blocks. 
