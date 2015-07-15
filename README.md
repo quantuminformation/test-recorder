@@ -13,8 +13,22 @@ expected (happy flow) as then you will have the tests generated for expected beh
 
 ##Angular
 
-The protractor test app has been copied to demo/protractorTestApp
-You can run this
+The protractor test app has been copied to demo/protractorTestApp. The test recorder has been added to this also.
+You can run it with this:
+
+`npm run demo-angular`
+
+###Testing
+This uses the basicConf.js to run a single file ('test-recorder-spec.js'), you can paste the generated test code into there
+
+You need ti start webdriver:
+`npm run webdriver`
+
+then run protractor with :
+`demo-angular-test`
+
+To run the placehold spec that you can paste teh generated code into, first start 
+
 
 ###Current UI interactions that are recorded for acceptance tests:
 
