@@ -21,7 +21,7 @@ You can run it with this:
 ###Testing
 This uses the basicConf.js to run a single file ('test-recorder-spec.js'), you can paste the generated test code into there
 
-You need ti start webdriver:
+You need to start webdriver:
 `npm run webdriver`
 
 then run protractor with :

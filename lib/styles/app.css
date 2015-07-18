@@ -1,0 +1,22 @@
+/**
+  this is the UI for the generated test code
+*/
+
+#testRecorderUI {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 3550px;
+  color: white;
+  height: 350px;
+  background-color: #272727;
+  overflow: scroll;
+  font-size: 10px;
+  resize: both;
+}
+
+#testRecorderUI-Title {
+  height: 15px;
+  background-color: #0000FF;
+  color: #d5ffec;
+}
