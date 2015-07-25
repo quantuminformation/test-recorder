@@ -4102,7 +4102,6 @@
 	  updateCodeCallback: null, //callback to the component to set the code, we need this here so we can tie into the framework we are automating
 	  generatedTestCode: "", //this is sent to what ever wants to receive generated code
 	  lastRoute: "",
-	  MUTATIONS_PLACEHOLDER: "[MUTATIONS_PLACEHOLDER]", //holds text to be added from mutations
 	
 	  currentCodeGenerator: null, //holds the env specific generator (angular,ember etc)
 	
@@ -4122,7 +4121,7 @@
 	    this.setUpClickListeners();
 	    this.setUpOtherListeners();
 	    //this will iterate through this node and watch for changes and store them until we want to display them
-	    _MutationUtils2["default"].addObserverForTarget(rootDomNode);
+	    _MutationUtils2["default"].addObserverForTarget(rootDomNode, this.currentCodeGenerator);
 	    this.setGeneratedScript(this.currentCodeGenerator.initialCode());
 	  },
 	
@@ -4229,19 +4228,7 @@
 	      //clear this if not DOM mutations happen ()
 	      var cleanText = self.generatedTestCode.replace(self.MUTATIONS_PLACEHOLDER, "");
 	      var newGeneratedScript = cleanText;
-	
-	      var newTestPrint = "click(\"" + _this3.getPlaybackPath(e) + "\");<br/>" + "andThen(function () {" + "<br/>";
-	
-	      //TEST 1 - > Assert the route is what it a changed to, if it changed
-	      //todo this needs to be looked at again as it assumes the route can only change after a click event
-	      newTestPrint += _this3.currentCodeGenerator.routeChanged();
-	
-	      //TEST 2 - > Place holder that will be replaced with dom visibility Assertions
-	      // the last one of these is replaced each time the mutation observes are run
-	      newTestPrint += self.MUTATIONS_PLACEHOLDER + "<br/>" +
-	      //Close the and then block
-	      "});<br/><br/>";
-	      // console.log(testLinePrint);
+	      var newTestPrint = _this3.currentCodeGenerator.clickHappened(_this3.getPlaybackPath(e));
 	
 	      //add to exisiting tests
 	      newGeneratedScript += newTestPrint;
@@ -4302,52 +4289,71 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
 	var _utilFormattingRules = __webpack_require__(5);
 	
 	var _utilFormattingRules2 = _interopRequireDefault(_utilFormattingRules);
 	
-	exports["default"] = {
-	  lastRoute: "",
-	  description: "Ember QUnit generator",
+	var _utilCommon = __webpack_require__(9);
+	
+	var _utilCommon2 = _interopRequireDefault(_utilCommon);
+	
+	exports['default'] = {
+	  lastRoute: '',
+	  description: 'Ember QUnit generator',
 	
 	  initialCode: function initialCode() {
 	    this.lastRoute = this.getCurrentRoute();
-	    return "visit(\"" + (this.lastRoute === "index" ? "/" : this.lastRoute) + "\");<br>";
+	    return 'visit("' + (this.lastRoute === 'index' ? '/' : this.lastRoute) + '");<br>';
 	  },
 	
 	  selectChange: function selectChange(queryPath, newSelectedIndex) {
-	    return "select triggered" + queryPath + newSelectedIndex;
+	    return 'select triggered' + queryPath + newSelectedIndex;
+	  },
+	
+	  clickHappened: function clickHappened(queryPath) {
+	    var code = 'click("' + queryPath + '");<br/>' + 'andThen(function () {' + '<br/>' +
+	
+	    //todo this needs to be looked at again as it assumes the route can only change after a click event
+	    this.routeChanged() + _utilCommon2['default'].MUTATIONS_PLACEHOLDER + '<br/>' + '});<br/><br/>';
+	    return code;
 	  },
 	
 	  inputTextEdited: function inputTextEdited(queryPath, newValue) {
-	    return "fillIn(\"" + queryPath + "\", \"" + newValue + "\");<br/>";
+	    return 'fillIn("' + queryPath + '", "' + newValue + '");<br/>';
 	  },
 	
 	  routeChanged: function routeChanged() {
 	
 	    if (this.lastRoute !== this.getCurrentRoute()) {
 	      this.lastRoute = this.getCurrentRoute();
-	      var code = _utilFormattingRules2["default"].indentation + "assert.equal(currentRouteName(), \"" + this.getCurrentRoute() + "\", \"The page navigates to " + this.getCurrentRoute() + " on button click\");<br/>";
+	      var code = _utilFormattingRules2['default'].indentation + 'assert.equal(currentRouteName(), "' + this.getCurrentRoute() + '", "The page navigates to ' + this.getCurrentRoute() + ' on button click");<br/>';
 	      return code;
 	    }
-	    return "";
+	    return '';
 	  },
 	
 	  getCurrentRoute: function getCurrentRoute() {
-	    var isIndex = window.location.pathname === "/";
-	    var pathArray = window.location.pathname.split("/");
-	    return isIndex ? "index" : pathArray[1];
+	    var isIndex = window.location.pathname === '/';
+	    var pathArray = window.location.pathname.split('/');
+	    return isIndex ? 'index' : pathArray[1];
+	  },
+	  elementAdded: function elementAdded(id) {
+	    return _utilFormattingRules2['default'].indentation + 'assert.equal(find("#' + id + '").length, 1, "' + id + ' shown AFTER user [INSERT REASON]");' + '<br/>';
+	  },
+	  elementRemoved: function elementRemoved(id) {
+	    return _utilFormattingRules2['default'].indentation + 'assert.equal(find("#' + id + '").length, 0, "' + id + ' removed AFTER user [INSERT REASON]");' + '<br/>';
 	  }
+	
 	};
-	module.exports = exports["default"];
+	module.exports = exports['default'];
 
 /***/ },
 /* 5 */
@@ -4367,58 +4373,75 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
 	var _utilFormattingRules = __webpack_require__(5);
 	
 	var _utilFormattingRules2 = _interopRequireDefault(_utilFormattingRules);
 	
-	exports["default"] = {
-	  lastRoute: "",
-	  description: "Angular 1.x generator",
+	var _utilCommon = __webpack_require__(9);
+	
+	var _utilCommon2 = _interopRequireDefault(_utilCommon);
+	
+	exports['default'] = {
+	  lastRoute: '',
+	  description: 'Angular 1.x generator',
 	
 	  initialCode: function initialCode() {
 	    this.lastRoute = this.getCurrentRoute();
 	
-	    /*var code =
-	        "beforeEach(function() {"+
-	          "browser.get('index.html#/"form');
-	        });*/
+	    var code = 'beforeEach(function() {<br>' + _utilFormattingRules2['default'].indentation + 'browser.get(\'index.html#' + this.lastRoute + '\');<br>' + '});<br>';
 	
-	    return "visit(\"" + (this.lastRoute === "index" ? "/" : this.lastRoute) + "\");<br>";
+	    return code;
 	  },
 	
 	  selectChange: function selectChange(queryPath, newSelectedIndex) {
-	    return "select triggered" + queryPath + newSelectedIndex;
+	    return 'select triggered' + queryPath + newSelectedIndex;
+	  },
+	
+	  clickHappened: function clickHappened(queryPath) {
+	    var code = 'element(' + queryPath + ')click().then(function(){<br/>' +
+	
+	    //todo this needs to be looked at again as it assumes the route can only change after a click event
+	    this.routeChanged() + _utilCommon2['default'].MUTATIONS_PLACEHOLDER + '<br/>' + '});<br/><br/>';
+	    return code;
 	  },
 	
 	  inputTextEdited: function inputTextEdited(queryPath, newValue) {
-	    return "fillIn(\"" + queryPath + "\", \"" + newValue + "\");<br/>";
+	    return 'element(' + queryPath + ').setValue(' + newValue + ');';
 	  },
 	
 	  routeChanged: function routeChanged() {
 	
 	    if (this.lastRoute !== this.getCurrentRoute()) {
 	      this.lastRoute = this.getCurrentRoute();
-	      var code = _utilFormattingRules2["default"].indentation + "assert.equal(currentRouteName(), \"" + this.getCurrentRoute() + "\", \"The page navigates to " + this.getCurrentRoute() + " on button click\");<br/>";
+	      var code = _utilFormattingRules2['default'].indentation + 'assert.equal(currentRouteName(), "' + this.getCurrentRoute() + '", "The page navigates to ' + this.getCurrentRoute() + ' on button click");<br/>';
 	      return code;
 	    }
-	    return "";
+	    return '';
 	  },
 	
 	  getCurrentRoute: function getCurrentRoute() {
-	    var isIndex = window.location.pathname === "/";
-	    var pathArray = window.location.pathname.split("/");
-	    return isIndex ? "index" : pathArray[1];
+	    var isIndex = window.location.pathname === '/';
+	    var pathArray = window.location.pathname.split('/');
+	    return isIndex ? 'index' : pathArray[1];
+	  },
+	
+	  elementAdded: function elementAdded(id) {
+	    return _utilFormattingRules2['default'].indentation + 'expect($(\'#' + id + '\').isDisplayed()).toBe(true); \'<br/>\'';
+	  },
+	  elementRemoved: function elementRemoved(id) {
+	    return _utilFormattingRules2['default'].indentation + 'expect($(\'#' + id + '\').isDisplayed()).toBe(false); \'<br/>\'';
 	  }
+	
 	};
-	module.exports = exports["default"];
+	module.exports = exports['default'];
 
 /***/ },
 /* 7 */
@@ -4444,8 +4467,9 @@
 	  /**
 	   * Adds observer for target and generates source code
 	   * @param target
+	   * @param currentCodeGenerator contains the code rules
 	   */
-	  addObserverForTarget: function addObserverForTarget(target) {
+	  addObserverForTarget: function addObserverForTarget(target, currentCodeGenerator) {
 	
 	    var self = this;
 	    var observer = new MutationObserver(function (mutations) {
@@ -4482,11 +4506,11 @@
 	        }
 	
 	        addedNodesArray.forEach(function (node) {
-	          addedNodesTestText += _formattingRules2["default"].indentation + "assert.equal(find(\"#" + node.id + "\").length, 1, \"" + node.id + " shown AFTER user [INSERT REASON]\");" + "<br/>";
+	          addedNodesTestText += currentCodeGenerator.elementAdded(node.id);
 	        });
 	
 	        removedNodesArray.forEach(function (node) {
-	          removedNodesTestText += _formattingRules2["default"].indentation + "assert.equal(find(\"#" + node.id + "\").length, 0, \"" + node.id + " removed AFTER user [INSERT REASON]\");" + "<br/>";
+	          removedNodesTestText += currentCodeGenerator.elementRemoved(node.id);
 	        });
 	
 	        //todo find a better way for this result to be inserted in the generatedCode
@@ -4574,6 +4598,20 @@
 	  }
 	};
 	
+	module.exports = exports["default"];
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = {
+	  MUTATIONS_PLACEHOLDER: "[MUTATIONS_PLACEHOLDER]" //holds text to be added from mutations
+	};
 	module.exports = exports["default"];
 
 /***/ }
