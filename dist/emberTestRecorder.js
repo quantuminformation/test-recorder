@@ -4396,7 +4396,7 @@
 	  initialCode: function initialCode() {
 	    this.lastRoute = this.getCurrentRoute();
 	
-	    var code = 'beforeEach(function() {<br>' + _utilFormattingRules2['default'].indentation + 'browser.get(\'index.html#' + this.lastRoute + '\');<br>' + '});<br>';
+	    var code = 'beforeEach(function() {<br>' + _utilFormattingRules2['default'].indentation + 'browser.get(\'' + this.lastRoute + '\');<br>' + '});<br>';
 	
 	    return code;
 	  },

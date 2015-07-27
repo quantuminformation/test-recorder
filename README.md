@@ -13,8 +13,12 @@ expected (happy flow) as then you will have the tests generated for expected beh
 
 ##Angular
 
-The protractor test app has been copied to demo/protractorTestApp. The test recorder has been added to this also.
-You can run it with this:
+The Angular todo app has been copied to demo/angular-1-TODO. The test recorder has been added to this also via a symlink 
+to the /dist folder which contains the webpack build of the test recorder.
+
+The first thing you need to do is install the local npm dependencies to the angular 1 demo app.
+
+You can run the angular todo app with this, which will start up an express server
 
 `npm run demo-angular`
 
@@ -25,7 +29,7 @@ You need to start webdriver:
 `npm run webdriver`
 
 then run protractor with :
-`demo-angular-test`
+`npm run demo-angular-test`
 
 To run the placehold spec that you can paste teh generated code into, first start 
 

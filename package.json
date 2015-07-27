@@ -6,8 +6,8 @@
   "scripts": {
     "test": "test",
     "webdriver": "webdriver-manager start --standalone",
-    "demo-angular": "node demo/protractorTestApp/scripts/web-server.js ",
-    "demo-angular-test": "protractor demo/protractorTestApp/basicConf.js "
+    "demo-angular": "node demo/angular-1-TODO/server.js",
+    "demo-angular-test": "protractor demo/angular-1-TODO/basicConf.js "
   },
   "repository": {
     "type": "git",
