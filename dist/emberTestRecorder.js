@@ -4054,8 +4054,10 @@
 	      currentCodeGenerator = _codeGeneratorsAngular1Protractor2['default'];
 	      break;
 	  }
+	  var ui = document.createElement('div');
+	  ui.innerHTML += '<div id="testRecorderUI" class="dont" onclick="selectText()">' + '<div id="testRecorderUI-Title">' + currentCodeGenerator.description + '</div>' + '<div id="generatedScript"></div>' + '</div> ';
 	
-	  document.body.innerHTML += '<div id="testRecorderUI" class="dont" onclick="selectText()">' + '<div id="testRecorderUI-Title">' + currentCodeGenerator.description + '</div>' + '<div id="generatedScript"></div>' + '</div> ';
+	  document.body.appendChild(ui);
 	
 	  var codeOutputDiv = document.getElementById('generatedScript');
 	  _utilTestRecorderUtils2['default'].setupAll(rootDomNode, codeOutputDiv, currentCodeGenerator);
@@ -4149,18 +4151,14 @@
 	    var _iteratorError = undefined;
 	
 	    try {
-	      for (var _iterator = document.querySelectorAll("input")[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	      for (var _iterator = document.querySelectorAll("input[type='text']")[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	        var item = _step.value;
 	
 	        item.addEventListener("focusout", function (e) {
 	          e.target.classList.add("active");
-	          if (e.target.localName === "input" && e.target.type === "text") {
-	            var newCode = _this.currentCodeGenerator.inputTextEdited(self.getPlaybackPath(e), e.target.value);
-	            //add to existing tests
-	            self.appendToGeneratedScript(newCode);
-	          } else {
-	            return;
-	          }
+	          var newCode = _this.currentCodeGenerator.inputTextEdited(self.getPlaybackPath(e), e.target.value);
+	          //add to existing tests
+	          self.appendToGeneratedScript(newCode);
 	        }, false);
 	      }
 	    } catch (err) {
@@ -4414,7 +4412,7 @@
 	  },
 	
 	  inputTextEdited: function inputTextEdited(queryPath, newValue) {
-	    return 'element(' + queryPath + ').setValue(' + newValue + ');';
+	    return '$(' + queryPath + ').sendKeys(' + newValue + ');';
 	  },
 	
 	  routeChanged: function routeChanged() {
