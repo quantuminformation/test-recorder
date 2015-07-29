@@ -40,6 +40,8 @@ To run the placehold spec that you can paste teh generated code into, first star
 * Record any changes to route
 * Changes in DOM additions/removals, only items with ID's are recorded and that don't have the doNotRecord css class.
 
+## Ember
+
 To use this, simply include this line of code someone in your app, I recommend in your `app.js`:
 
 ```js
@@ -62,7 +64,7 @@ If you don't want an element to be recorded, and any of its children add this cl
 * Allow selects to be automated
 * Allow more complex click actions like the steps to click on inputs like select2 to be recorded
 * Ignore clicks on ember elements with no effect
-* Get mutations to work with async effects
+* Get mutations to work with async effects (use Bluebird + promise api)
 * Separate out recording to its own library and just use ember adapters for code test style
 
 
