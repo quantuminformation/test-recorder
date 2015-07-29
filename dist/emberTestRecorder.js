@@ -4024,17 +4024,21 @@
 	
 	var _utilTestRecorderUtils2 = _interopRequireDefault(_utilTestRecorderUtils);
 	
-	var _utilDetectFramework = __webpack_require__(8);
+	var _utilDetectFramework = __webpack_require__(7);
 	
 	var _utilDetectFramework2 = _interopRequireDefault(_utilDetectFramework);
 	
-	var _codeGeneratorsEmberQUnit = __webpack_require__(4);
+	var _codeGeneratorsEmberQUnit = __webpack_require__(8);
 	
 	var _codeGeneratorsEmberQUnit2 = _interopRequireDefault(_codeGeneratorsEmberQUnit);
 	
-	var _codeGeneratorsAngular1Protractor = __webpack_require__(6);
+	var _codeGeneratorsAngular1Protractor = __webpack_require__(9);
 	
 	var _codeGeneratorsAngular1Protractor2 = _interopRequireDefault(_codeGeneratorsAngular1Protractor);
+	
+	var _utilCommon = __webpack_require__(6);
+	
+	var _utilCommon2 = _interopRequireDefault(_utilCommon);
 	
 	NodeList.prototype[Symbol.iterator] = Array.prototype[Symbol.iterator]; //for chrome
 	
@@ -4045,22 +4049,22 @@
 	  var rootDomNode = document.querySelector('body');
 	  //set up the extra UI
 	
-	  var currentCodeGenerator;
 	  switch ((0, _utilDetectFramework2['default'])()) {
 	    case 'ember':
-	      currentCodeGenerator = _codeGeneratorsEmberQUnit2['default'];
+	      _utilCommon2['default'].currentCodeGenerator = _codeGeneratorsEmberQUnit2['default'];
 	      break;
 	    case 'angular':
-	      currentCodeGenerator = _codeGeneratorsAngular1Protractor2['default'];
+	      _utilCommon2['default'].currentCodeGenerator = _codeGeneratorsAngular1Protractor2['default'];
 	      break;
 	  }
 	  var ui = document.createElement('div');
-	  ui.innerHTML += '<div id="testRecorderUI" class="dont" onclick="selectText()">' + '<div id="testRecorderUI-Title">' + currentCodeGenerator.description + '</div>' + '<div id="generatedScript"></div>' + '</div> ';
+	  ui.innerHTML += '<div id="testRecorderUI" class="dont">' + '<div id="testRecorderUI-Title">' + _utilCommon2['default'].currentCodeGenerator.description + '</div>' + '<div id="generatedScript"></div>' + '</div> ';
 	
 	  document.body.appendChild(ui);
+	  document.getElementById('generatedScript').onclick = selectText;
 	
 	  var codeOutputDiv = document.getElementById('generatedScript');
-	  _utilTestRecorderUtils2['default'].setupAll(rootDomNode, codeOutputDiv, currentCodeGenerator);
+	  _utilTestRecorderUtils2['default'].setupAll(rootDomNode, codeOutputDiv);
 	};
 	
 	/**
@@ -4087,25 +4091,27 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	//todo perhaps use typescript to have these as interface implementation
-	"use strict";
+	'use strict';
 	
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 	
-	var _MutationUtils = __webpack_require__(7);
+	var _MutationUtils = __webpack_require__(4);
 	
 	var _MutationUtils2 = _interopRequireDefault(_MutationUtils);
 	
-	exports["default"] = {
+	var _common = __webpack_require__(6);
+	
+	var _common2 = _interopRequireDefault(_common);
+	
+	exports['default'] = {
 	
 	  updateCodeCallback: null, //callback to the component to set the code, we need this here so we can tie into the framework we are automating
-	  generatedTestCode: "", //this is sent to what ever wants to receive generated code
-	  lastRoute: "",
-	
-	  currentCodeGenerator: null, //holds the env specific generator (angular,ember etc)
+	  generatedTestCode: '', //this is sent to what ever wants to receive generated code
+	  lastRoute: '',
 	
 	  codeOutputDiv: null, //holds the screen for the code
 	
@@ -4113,79 +4119,54 @@
 	   * Wires up everything
 	   * @param rootDomNode
 	   * @param updateCodeCallback //the only reason for this is so we can update the ember component or protractor
-	   * @param currentCodeGenerator
 	   */
-	  setupAll: function setupAll(rootDomNode, codeOutputDiv, currentCodeGenerator) {
+	  setupAll: function setupAll(rootDomNode, codeOutputDiv) {
 	
-	    this.currentCodeGenerator = currentCodeGenerator;
 	    this.codeOutputDiv = codeOutputDiv;
 	    this.setUpChangeListeners();
 	    this.setUpClickListeners();
 	    this.setUpOtherListeners();
 	    //this will iterate through this node and watch for changes and store them until we want to display them
-	    _MutationUtils2["default"].addObserverForTarget(rootDomNode, this.currentCodeGenerator);
-	    this.setGeneratedScript(this.currentCodeGenerator.initialCode());
+	    _MutationUtils2['default'].addObserverForTarget(rootDomNode, _common2['default'].currentCodeGenerator);
+	    this.setGeneratedScript(_common2['default'].currentCodeGenerator.initialCode());
 	  },
 	
 	  setGeneratedScript: function setGeneratedScript(code) {
 	    this.generatedTestCode = code;
 	    //todo perhaps use Object.observe once FF supports it
-	    this.codeOutputDiv.innerHTML = "<pre>" + this.generatedTestCode + "</pre>";
+	    this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>';
 	  },
 	  appendToGeneratedScript: function appendToGeneratedScript(code) {
 	    this.generatedTestCode += code;
 	    //todo perhaps use Object.observe once FF supports it
-	    this.codeOutputDiv.innerHTML = "<pre>" + this.generatedTestCode + "</pre>";
+	    this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>';
 	  },
 	
 	  setUpOtherListeners: function setUpOtherListeners() {
-	    var _this = this;
 	
 	    var self = this;
 	
 	    /**
 	     * this is used for capturing text input fill-ins
 	     */
-	    var _iteratorNormalCompletion = true;
-	    var _didIteratorError = false;
-	    var _iteratorError = undefined;
 	
-	    try {
-	      for (var _iterator = document.querySelectorAll("input[type='text']")[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-	        var item = _step.value;
-	
-	        item.addEventListener("focusout", function (e) {
-	          e.target.classList.add("active");
-	          var newCode = _this.currentCodeGenerator.inputTextEdited(self.getPlaybackPath(e), e.target.value);
-	          //add to existing tests
-	          self.appendToGeneratedScript(newCode);
-	        }, false);
+	    document.addEventListener('focusout', function (e) {
+	      if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
+	        var newCode = _common2['default'].currentCodeGenerator.inputTextEdited(self.getPlaybackPath(e), e.target.value);
+	        self.appendToGeneratedScript(newCode);
 	      }
-	    } catch (err) {
-	      _didIteratorError = true;
-	      _iteratorError = err;
-	    } finally {
-	      try {
-	        if (!_iteratorNormalCompletion && _iterator["return"]) {
-	          _iterator["return"]();
-	        }
-	      } finally {
-	        if (_didIteratorError) {
-	          throw _iteratorError;
-	        }
-	      }
-	    }
+	    });
 	  },
 	
 	  setUpChangeListeners: function setUpChangeListeners() {
-	    var _this2 = this;
+	    var _this = this;
 	
-	    document.addEventListener("change", function (e) {
+	    document.addEventListener('change', function (e) {
 	      //setsUpSelect input watching
-	      if (e.target.localName === "select") {
+	      if (e.target.localName === 'select') {
 	        var newSelectedIndex = e.target.selectedIndex;
-	        var newCode = _this2.currentCodeGenerator.selectChange(_this2.getPlaybackPath(e), newSelectedIndex);
-	        _this2.appendToGeneratedScript(newCode);
+	        var newCode = _common2['default'].currentCodeGenerator.selectChange(_this.getPlaybackPath(e), newSelectedIndex);
+	        _this.appendToGeneratedScript(newCode);
 	      }
 	    });
 	
@@ -4209,33 +4190,33 @@
 	   * //todo consider wrapping mutations code in timeout to give async ops time
 	   */
 	  setUpClickListeners: function setUpClickListeners() {
-	    var _this3 = this;
+	    var _this2 = this;
 	
 	    var self = this;
 	
-	    document.addEventListener("click", function (e) {
+	    document.addEventListener('click', function (e) {
 	
-	      if (e.target.localName === "input" && e.target.type === "text" || //on listen to focus-out for these
-	      e.target.localName === "html" || //don't want to record clicking outside the app'
-	      e.target.localName === "pre" || //don't want to recorded the output code'
-	      e.target.type === "select-one") {
+	      if (e.target.localName === 'input' && e.target.type === 'text' || //on listen to focus-out for these
+	      e.target.localName === 'html' || //don't want to record clicking outside the app'
+	      e.target.localName === 'pre' || //don't want to recorded the output code'
+	      e.target.type === 'select-one') {
 	        // so listen to clicks on select inputs, we handle this with triggers
 	        return;
 	      }
 	
 	      //clear this if not DOM mutations happen ()
-	      var cleanText = self.generatedTestCode.replace(self.MUTATIONS_PLACEHOLDER, "");
+	      var cleanText = self.generatedTestCode.replace(_common2['default'].MUTATIONS_PLACEHOLDER, '');
 	      var newGeneratedScript = cleanText;
-	      var newTestPrint = _this3.currentCodeGenerator.clickHappened(_this3.getPlaybackPath(e));
+	      var newTestPrint = _common2['default'].currentCodeGenerator.clickHappened(_this2.getPlaybackPath(e));
 	
 	      //add to exisiting tests
 	      newGeneratedScript += newTestPrint;
 	
 	      //todo make async, because the click event happens after mutations then we can immediately put this in, this should be put
 	      //in after after a user defined time period to allow server operations that take time
-	      var withReplacement = newGeneratedScript.replace(self.MUTATIONS_PLACEHOLDER, _MutationUtils2["default"].pendingGeneratedDomChangedScript);
+	      var withReplacement = newGeneratedScript.replace(self.MUTATIONS_PLACEHOLDER, _MutationUtils2['default'].pendingGeneratedDomChangedScript);
 	      self.setGeneratedScript(withReplacement);
-	      _MutationUtils2["default"].pendingGeneratedDomChangedScript = "";
+	      _MutationUtils2['default'].pendingGeneratedDomChangedScript = '';
 	    });
 	  },
 	
@@ -4246,14 +4227,14 @@
 	  getPlaybackPath: function getPlaybackPath(e) {
 	    var hasEmberIdRegex = /ember[\d]+/;
 	    if (e.target.id && !hasEmberIdRegex.test(e.target.id)) {
-	      return "#" + e.target.id;
+	      return '#' + e.target.id;
 	    } else {
 	      var path = e.path.reverse().slice(2); //remove the window and document path sections
 	      var fullPath = path.map(function (element) {
 	        // we need to make each path segment more specific if other siblings of the same type exist
 	        var index = findNthChildIndex(element);
-	        return element.localName + (index !== -1 ? ":nth-child(" + index + ")" : "");
-	      }).join(">"); //join all the segments for the query selector
+	        return element.localName + (index !== -1 ? ':nth-child(' + index + ')' : '');
+	      }).join('>'); //join all the segments for the query selector
 	      console.log(fullPath);
 	      return fullPath;
 	    }
@@ -4281,10 +4262,199 @@
 	  }
 	  return Array.from(children).indexOf(element) + 1; //because nth child is 1 indexed
 	}
-	module.exports = exports["default"];
+	module.exports = exports['default'];
 
 /***/ },
 /* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _formattingRules = __webpack_require__(5);
+	
+	var _formattingRules2 = _interopRequireDefault(_formattingRules);
+	
+	var _common = __webpack_require__(6);
+	
+	var _common2 = _interopRequireDefault(_common);
+	
+	exports['default'] = {
+	
+	  mutationObserversArr: [],
+	  pendingGeneratedDomChangedScript: '', //this is observed by TestRecorderUtils
+	
+	  /**
+	   * Adds observer for target and generates source code
+	   * @param target
+	   */
+	  addObserverForTarget: function addObserverForTarget(target) {
+	    var self = this;
+	    var observer = new MutationObserver(function (mutations) {
+	      mutations.forEach(function (mutation) {
+	
+	        var addedNodesTestText = '';
+	        var removedNodesTestText = '';
+	
+	        //convert these to Arrays
+	        var addedNodesArray = Array.prototype.slice.call(mutation.addedNodes);
+	        var removedNodesArray = Array.prototype.slice.call(mutation.removedNodes);
+	
+	        // This array is used to add new mutation Observers from the newly added DOM
+	        var newMutationsFromAddedNodesArray = addedNodesArray.filter(filterDoNotRecordAndWhiteSpace);
+	
+	        //loop through the above and add observers, we need to do this dynamically
+	        newMutationsFromAddedNodesArray.forEach(function (node) {
+	          self.addObserverForTarget(node); //just drill down 2 levels more
+	        });
+	
+	        //this array is used to generate the source code, we filter
+	        addedNodesArray = addedNodesArray.filter(filter_DoNotRecord_WhiteSpace_emberID_noID);
+	        removedNodesArray = removedNodesArray.filter(filter_DoNotRecord_WhiteSpace_emberID_noID);
+	
+	        if (!addedNodesArray.length && !removedNodesArray.length) {
+	          //no point continuing in this iteration if nothing of interest
+	          return;
+	        }
+	
+	        //mutations should be mutually exclusive?
+	        if (addedNodesArray.length && removedNodesArray.length) {
+	          alert('strange');
+	          return;
+	        }
+	
+	        addedNodesArray.forEach(function (node) {
+	          addedNodesTestText += _common2['default'].currentCodeGenerator.elementAdded(node.id);
+	        });
+	
+	        removedNodesArray.forEach(function (node) {
+	          removedNodesTestText += _common2['default'].currentCodeGenerator.elementRemoved(node.id);
+	        });
+	
+	        //todo find a better way for this result to be inserted in the generatedCode
+	        self.pendingGeneratedDomChangedScript = self.pendingGeneratedDomChangedScript + (addedNodesTestText || removedNodesTestText);
+	        // self.set("generatedScript", newText);
+	        console.log(mutation);
+	      });
+	    });
+	    var config = { attributes: true, childList: true, characterData: true };
+	
+	    //this is the only place where observe is called so we can track them here too to disconnect
+	    observer.observe(target, config);
+	    this.mutationObserversArr.push(observer);
+	    this.addInnerObserversForTarget(target, 0);
+	  },
+	
+	  /**
+	   * Create observers for the children
+	   * Can be used recursively to desired depth, atm this is set to max of 4
+	   * @param target
+	   */
+	  addInnerObserversForTarget: function addInnerObserversForTarget(target, currentLevel) {
+	    for (var i = 0; target.children && i < target.children.length; i++) {
+	      var child = target.children[i];
+	      var classListArray = child.classList && Array.prototype.slice.call(child.classList);
+	      var hasDoNotRecordClass = classListArray ? classListArray.indexOf('doNotRecord') !== -1 : false;
+	
+	      if (!hasDoNotRecordClass) {
+	        //abort any recording of this dom tree
+	        this.addObserverForTarget(child);
+	        if (currentLevel <= 6) {
+	          //todo compare with root ember element
+	          var nextLevel = currentLevel + 1;
+	          this.addInnerObserversForTarget(child, nextLevel);
+	        }
+	      }
+	    }
+	  }
+	};
+	
+	function filter_DoNotRecord_WhiteSpace_emberID_noID(node) {
+	  var classListArray = node.classList && Array.prototype.slice.call(node.classList);
+	  //var isEmberView = classListArray ? (classListArray.indexOf("ember-view") === -1) : false;
+	  var hasDoNotRecordClass = classListArray ? classListArray.indexOf('doNotRecord') !== -1 : false;
+	
+	  //the check here is we don't want to record
+	  // 1 whitespace
+	  // 2 things with no id
+	  // 3 things that have a hasDoNotRecordClass
+	  // 4 things with an ember id, (where a user has not given one but ember needs to add an id)
+	  var hasEmberIdRegex = /ember[\d]+/;
+	
+	  return node.nodeType !== 3 && node.id && !hasDoNotRecordClass && !hasEmberIdRegex.test(node.id);
+	}
+	
+	function filterDoNotRecordAndWhiteSpace(node) {
+	  var classListArray = node.classList && Array.prototype.slice.call(node.classList);
+	  //var isEmberView = classListArray ? (classListArray.indexOf("ember-view") === -1) : false;
+	  var hasDoNotRecordClass = classListArray ? classListArray.indexOf('doNotRecord') !== -1 : false;
+	  return node.nodeType !== 3 && !hasDoNotRecordClass;
+	}
+	module.exports = exports['default'];
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	exports['default'] = {
+	  indentation: ' ' //2 spaces
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports["default"] = {
+	  MUTATIONS_PLACEHOLDER: "[MUTATIONS_PLACEHOLDER]", //holds text to be added from mutations
+	  currentCodeGenerator: null //holds the env specific generator (angular,ember etc)
+	
+	};
+	module.exports = exports["default"];
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	//todo make this more robust, or let user specify manually
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	exports["default"] = function () {
+	  var isAngular = window.angular;
+	  var isEmber = window.ember;
+	
+	  if (isAngular) {
+	    return "angular";
+	  } else if (isEmber) {
+	    return "ember";
+	  } else {
+	    throw "no framework found";
+	  }
+	};
+	
+	module.exports = exports["default"];
+
+/***/ },
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4299,7 +4469,7 @@
 	
 	var _utilFormattingRules2 = _interopRequireDefault(_utilFormattingRules);
 	
-	var _utilCommon = __webpack_require__(9);
+	var _utilCommon = __webpack_require__(6);
 	
 	var _utilCommon2 = _interopRequireDefault(_utilCommon);
 	
@@ -4354,21 +4524,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 5 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-	exports['default'] = {
-	  indentation: ' ' //2 spaces
-	};
-	module.exports = exports['default'];
-
-/***/ },
-/* 6 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4383,7 +4539,7 @@
 	
 	var _utilFormattingRules2 = _interopRequireDefault(_utilFormattingRules);
 	
-	var _utilCommon = __webpack_require__(9);
+	var _utilCommon = __webpack_require__(6);
 	
 	var _utilCommon2 = _interopRequireDefault(_utilCommon);
 	
@@ -4391,12 +4547,15 @@
 	  lastRoute: '',
 	  description: 'Angular 1.x generator',
 	
+	  //todo decide what to do here
 	  initialCode: function initialCode() {
-	    this.lastRoute = this.getCurrentRoute();
-	
-	    var code = 'beforeEach(function() {<br>' + _utilFormattingRules2['default'].indentation + 'browser.get(\'' + this.lastRoute + '\');<br>' + '});<br>';
-	
-	    return code;
+	    /* this.lastRoute = this.getCurrentRoute();
+	      var code =
+	       "beforeEach(function() {<br>" +
+	       formattingRules.indentation + "browser.get('" + this.lastRoute + "');<br>" +
+	       "});<br>"
+	      return code;*/
+	    return '';
 	  },
 	
 	  selectChange: function selectChange(queryPath, newSelectedIndex) {
@@ -4412,7 +4571,7 @@
 	  },
 	
 	  inputTextEdited: function inputTextEdited(queryPath, newValue) {
-	    return '$(' + queryPath + ').sendKeys(' + newValue + ');';
+	    return '$(\'' + queryPath + '\').sendKeys(\'' + newValue + '\');<br/>';
 	  },
 	
 	  routeChanged: function routeChanged() {
@@ -4440,177 +4599,6 @@
 	
 	};
 	module.exports = exports['default'];
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-	
-	var _formattingRules = __webpack_require__(5);
-	
-	var _formattingRules2 = _interopRequireDefault(_formattingRules);
-	
-	exports["default"] = {
-	
-	  mutationObserversArr: [],
-	  pendingGeneratedDomChangedScript: "", //this is observed by TestRecorderUtils
-	
-	  /**
-	   * Adds observer for target and generates source code
-	   * @param target
-	   * @param currentCodeGenerator contains the code rules
-	   */
-	  addObserverForTarget: function addObserverForTarget(target, currentCodeGenerator) {
-	
-	    var self = this;
-	    var observer = new MutationObserver(function (mutations) {
-	      mutations.forEach(function (mutation) {
-	
-	        var addedNodesTestText = "";
-	        var removedNodesTestText = "";
-	
-	        //convert these to Arrays
-	        var addedNodesArray = Array.prototype.slice.call(mutation.addedNodes);
-	        var removedNodesArray = Array.prototype.slice.call(mutation.removedNodes);
-	
-	        // This array is used to add new mutation Observers from the newly added DOM
-	        var newMutationsFromAddedNodesArray = addedNodesArray.filter(filterDoNotRecordAndWhiteSpace);
-	
-	        //loop through the above and add observers, we need to do this dynamically
-	        newMutationsFromAddedNodesArray.forEach(function (node) {
-	          self.addObserverForTarget(node); //just drill down 2 levels more
-	        });
-	
-	        //this array is used to generate the source code, we filter
-	        addedNodesArray = addedNodesArray.filter(filter_DoNotRecord_WhiteSpace_emberID_noID);
-	        removedNodesArray = removedNodesArray.filter(filter_DoNotRecord_WhiteSpace_emberID_noID);
-	
-	        if (!addedNodesArray.length && !removedNodesArray.length) {
-	          //no point continuing in this iteration if nothing of interest
-	          return;
-	        }
-	
-	        //mutations should be mutually exclusive?
-	        if (addedNodesArray.length && removedNodesArray.length) {
-	          alert("strange");
-	          return;
-	        }
-	
-	        addedNodesArray.forEach(function (node) {
-	          addedNodesTestText += currentCodeGenerator.elementAdded(node.id);
-	        });
-	
-	        removedNodesArray.forEach(function (node) {
-	          removedNodesTestText += currentCodeGenerator.elementRemoved(node.id);
-	        });
-	
-	        //todo find a better way for this result to be inserted in the generatedCode
-	        self.pendingGeneratedDomChangedScript = self.pendingGeneratedDomChangedScript + (addedNodesTestText || removedNodesTestText);
-	        // self.set("generatedScript", newText);
-	        console.log(mutation);
-	      });
-	    });
-	    var config = { attributes: true, childList: true, characterData: true };
-	
-	    //this is the only place where observe is called so we can track them here too to disconnect
-	    observer.observe(target, config);
-	    this.mutationObserversArr.push(observer);
-	    this.addInnerObserversForTarget(target, 0);
-	  },
-	
-	  /**
-	   * Create observers for the children
-	   * Can be used recursively to desired depth, atm this is set to max of 4
-	   * @param target
-	   */
-	  addInnerObserversForTarget: function addInnerObserversForTarget(target, currentLevel) {
-	    for (var i = 0; target.children && i < target.children.length; i++) {
-	      var child = target.children[i];
-	      var classListArray = child.classList && Array.prototype.slice.call(child.classList);
-	      var hasDoNotRecordClass = classListArray ? classListArray.indexOf("doNotRecord") !== -1 : false;
-	
-	      if (!hasDoNotRecordClass) {
-	        //abort any recording of this dom tree
-	        this.addObserverForTarget(child);
-	        if (currentLevel <= 6) {
-	          //todo compare with root ember element
-	          var nextLevel = currentLevel + 1;
-	          this.addInnerObserversForTarget(child, nextLevel);
-	        }
-	      }
-	    }
-	  }
-	};
-	
-	function filter_DoNotRecord_WhiteSpace_emberID_noID(node) {
-	  var classListArray = node.classList && Array.prototype.slice.call(node.classList);
-	  //var isEmberView = classListArray ? (classListArray.indexOf("ember-view") === -1) : false;
-	  var hasDoNotRecordClass = classListArray ? classListArray.indexOf("doNotRecord") !== -1 : false;
-	
-	  //the check here is we don't want to record
-	  // 1 whitespace
-	  // 2 things with no id
-	  // 3 things that have a hasDoNotRecordClass
-	  // 4 things with an ember id, (where a user has not given one but ember needs to add an id)
-	  var hasEmberIdRegex = /ember[\d]+/;
-	
-	  return node.nodeType !== 3 && node.id && !hasDoNotRecordClass && !hasEmberIdRegex.test(node.id);
-	}
-	
-	function filterDoNotRecordAndWhiteSpace(node) {
-	  var classListArray = node.classList && Array.prototype.slice.call(node.classList);
-	  //var isEmberView = classListArray ? (classListArray.indexOf("ember-view") === -1) : false;
-	  var hasDoNotRecordClass = classListArray ? classListArray.indexOf("doNotRecord") !== -1 : false;
-	  return node.nodeType !== 3 && !hasDoNotRecordClass;
-	}
-	module.exports = exports["default"];
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	//todo make this more robust, or let user specify manually
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	exports["default"] = function () {
-	  var isAngular = window.angular;
-	  var isEmber = window.ember;
-	
-	  if (isAngular) {
-	    return "angular";
-	  } else if (isEmber) {
-	    return "ember";
-	  } else {
-	    throw "no framework found";
-	  }
-	};
-	
-	module.exports = exports["default"];
-
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports["default"] = {
-	  MUTATIONS_PLACEHOLDER: "[MUTATIONS_PLACEHOLDER]" //holds text to be added from mutations
-	};
-	module.exports = exports["default"];
 
 /***/ }
 /******/ ]);
