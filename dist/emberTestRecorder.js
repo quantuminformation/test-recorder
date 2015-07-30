@@ -4036,12 +4036,20 @@
 	
 	var _codeGeneratorsAngular1Protractor2 = _interopRequireDefault(_codeGeneratorsAngular1Protractor);
 	
+	var _codeGeneratorsReactProtractor = __webpack_require__(10);
+	
+	var _codeGeneratorsReactProtractor2 = _interopRequireDefault(_codeGeneratorsReactProtractor);
+	
 	var _utilCommon = __webpack_require__(6);
 	
 	var _utilCommon2 = _interopRequireDefault(_utilCommon);
 	
+	__webpack_require__(11); //webpack will bundle this into the script
+	
 	NodeList.prototype[Symbol.iterator] = Array.prototype[Symbol.iterator]; //for chrome
 	
+	// get the framework type from the script tag
+	var framework = document.currentScript.dataset.framework;
 	/**
 	 * Create the UI div that holds the generated code
 	 */
@@ -4049,12 +4057,16 @@
 	  var rootDomNode = document.querySelector('body');
 	  //set up the extra UI
 	
-	  switch ((0, _utilDetectFramework2['default'])()) {
+	  console.log(document.currentScript);
+	  switch (framework) {
 	    case 'ember':
 	      _utilCommon2['default'].currentCodeGenerator = _codeGeneratorsEmberQUnit2['default'];
 	      break;
 	    case 'angular':
 	      _utilCommon2['default'].currentCodeGenerator = _codeGeneratorsAngular1Protractor2['default'];
+	      break;
+	    case 'react':
+	      _utilCommon2['default'].currentCodeGenerator = _codeGeneratorsReactProtractor2['default'];
 	      break;
 	  }
 	  var ui = document.createElement('div');
@@ -4431,27 +4443,26 @@
 /* 7 */
 /***/ function(module, exports) {
 
-	//todo make this more robust, or let user specify manually
 	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	exports["default"] = function () {
-	  var isAngular = window.angular;
-	  var isEmber = window.ember;
-	
+
+	//todo make this more robust, or let user specify manually
+	// kinda unreliable will visit later
+
+	/*
+	export default function () {
+	  let isAngular = window.angular;
+	  let isEmber = window.ember;
+
 	  if (isAngular) {
 	    return "angular";
 	  } else if (isEmber) {
 	    return "ember";
-	  } else {
-	    throw "no framework found";
 	  }
-	};
-	
-	module.exports = exports["default"];
+	  else {
+	    throw ("no framework found")
+	  }
+	}
+	*/
 
 /***/ },
 /* 8 */
@@ -4599,6 +4610,404 @@
 	
 	};
 	module.exports = exports['default'];
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	
+	var _utilFormattingRules = __webpack_require__(5);
+	
+	var _utilFormattingRules2 = _interopRequireDefault(_utilFormattingRules);
+	
+	var _utilCommon = __webpack_require__(6);
+	
+	var _utilCommon2 = _interopRequireDefault(_utilCommon);
+	
+	exports['default'] = {
+	  lastRoute: '',
+	  description: 'React generator',
+	
+	  //todo decide what to do here
+	  initialCode: function initialCode() {
+	    /* this.lastRoute = this.getCurrentRoute();
+	      var code =
+	       "beforeEach(function() {<br>" +
+	       formattingRules.indentation + "browser.get('" + this.lastRoute + "');<br>" +
+	       "});<br>"
+	      return code;*/
+	    return '';
+	  },
+	
+	  selectChange: function selectChange(queryPath, newSelectedIndex) {
+	    return 'select triggered' + queryPath + newSelectedIndex;
+	  },
+	
+	  clickHappened: function clickHappened(queryPath) {
+	    var code = 'element(' + queryPath + ')click().then(function(){<br/>' +
+	
+	    //todo this needs to be looked at again as it assumes the route can only change after a click event
+	    this.routeChanged() + _utilCommon2['default'].MUTATIONS_PLACEHOLDER + '<br/>' + '});<br/><br/>';
+	    return code;
+	  },
+	
+	  inputTextEdited: function inputTextEdited(queryPath, newValue) {
+	    return '$(\'' + queryPath + '\').sendKeys(\'' + newValue + '\');<br/>';
+	  },
+	
+	  routeChanged: function routeChanged() {
+	
+	    if (this.lastRoute !== this.getCurrentRoute()) {
+	      this.lastRoute = this.getCurrentRoute();
+	      var code = _utilFormattingRules2['default'].indentation + 'assert.equal(currentRouteName(), "' + this.getCurrentRoute() + '", "The page navigates to ' + this.getCurrentRoute() + ' on button click");<br/>';
+	      return code;
+	    }
+	    return '';
+	  },
+	
+	  getCurrentRoute: function getCurrentRoute() {
+	    var isIndex = window.location.pathname === '/';
+	    var pathArray = window.location.pathname.split('/');
+	    return isIndex ? 'index' : pathArray[1];
+	  },
+	
+	  elementAdded: function elementAdded(id) {
+	    return _utilFormattingRules2['default'].indentation + 'expect($(\'#' + id + '\').isDisplayed()).toBe(true); \'<br/>\'';
+	  },
+	  elementRemoved: function elementRemoved(id) {
+	    return _utilFormattingRules2['default'].indentation + 'expect($(\'#' + id + '\').isDisplayed()).toBe(false); \'<br/>\'';
+	  }
+	
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(12);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(14)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./app.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./app.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(13)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, "/**\n  this is the UI for the generated test code\n*/\n\n#testRecorderUI {\n  position: absolute;\n  bottom: 0;\n  right: 0;\n  width: 350px;\n  color: white;\n  height: 350px;\n  background-color: #272727;\n  overflow: scroll;\n  font-size: 10px;\n  resize: both;\n}\n\n#testRecorderUI-Title {\n  height: 15px;\n  background-color: #0000FF;\n  color: #d5ffec;\n}\n", ""]);
+	
+	// exports
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
+	
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+	
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isOldIE = memoize(function() {
+			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0;
+	
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+	
+		options = options || {};
+		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+	
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+	
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+	
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+	
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+	
+	function createStyleElement() {
+		var styleElement = document.createElement("style");
+		var head = getHeadElement();
+		styleElement.type = "text/css";
+		head.appendChild(styleElement);
+		return styleElement;
+	}
+	
+	function createLinkElement() {
+		var linkElement = document.createElement("link");
+		var head = getHeadElement();
+		linkElement.rel = "stylesheet";
+		head.appendChild(linkElement);
+		return linkElement;
+	}
+	
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+	
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement());
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else if(obj.sourceMap &&
+			typeof URL === "function" &&
+			typeof URL.createObjectURL === "function" &&
+			typeof URL.revokeObjectURL === "function" &&
+			typeof Blob === "function" &&
+			typeof btoa === "function") {
+			styleElement = createLinkElement();
+			update = updateLink.bind(null, styleElement);
+			remove = function() {
+				styleElement.parentNode.removeChild(styleElement);
+				if(styleElement.href)
+					URL.revokeObjectURL(styleElement.href);
+			};
+		} else {
+			styleElement = createStyleElement();
+			update = applyToTag.bind(null, styleElement);
+			remove = function() {
+				styleElement.parentNode.removeChild(styleElement);
+			};
+		}
+	
+		update(obj);
+	
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+	
+	var replaceText = (function () {
+		var textStore = [];
+	
+		return function (index, replacement) {
+			textStore[index] = replacement;
+			return textStore.filter(Boolean).join('\n');
+		};
+	})();
+	
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+	
+		if (styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+	
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+		var sourceMap = obj.sourceMap;
+	
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+	
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+	
+	function updateLink(linkElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+		var sourceMap = obj.sourceMap;
+	
+		if(sourceMap) {
+			// http://stackoverflow.com/a/26603875
+			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+		}
+	
+		var blob = new Blob([css], { type: "text/css" });
+	
+		var oldSrc = linkElement.href;
+	
+		linkElement.href = URL.createObjectURL(blob);
+	
+		if(oldSrc)
+			URL.revokeObjectURL(oldSrc);
+	}
+
 
 /***/ }
 /******/ ]);
