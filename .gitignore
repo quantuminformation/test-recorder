@@ -14,5 +14,5 @@
 /libpeerconnection.log
 npm-debug.log
 testem.log
-.idea
-.npmignore
+/.idea
+/dist
