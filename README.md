@@ -27,7 +27,7 @@ click("html>body>div>div:eq(0)>button");
 andThen(function () {
  equal(find("#foo").length, 0, "foo removed AFTER user [INSERT REASON]");
 });
-
+```
 
 If you don't want an element to be recorded, and any of its children add this class to it `doNotRecord`
 
