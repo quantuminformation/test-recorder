@@ -14,6 +14,20 @@
 			<p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
 		</footer>
 
+
+
+    <!--Some non framework javascript just to test parts of the recording
+    //todo possibly share this across test apps or make it framework specific
+    -->
+    <script type="text/javascript">
+      function deleteNode(){
+        var element = document.getElementById("new-todo");
+        element.parentNode.removeChild(element);
+      }
+    </script>
+    <button id="deleteButton" onclick="deleteNode()">Delete todo's div with id</button>
+
+
 		<script src="node_modules/todomvc-common/base.js"></script>
 		<script src="node_modules/react/dist/react-with-addons.js"></script>
 		<script src="node_modules/react/dist/JSXTransformer.js"></script>

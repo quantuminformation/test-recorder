@@ -12,6 +12,7 @@ expected (happy flow) as then you will have the tests generated for expected beh
 #Current UI interactions that are recorded for acceptance tests:
 
 * Button clicks, they also generate andThen code blocks. 
+* records text input fillins
 * Record any changes to route
 * Changes in DOM additions/removals, only items with ID's are recorded and that don't have the doNotRecord css class.
 
@@ -31,13 +32,18 @@ andThen(function () {
 
 If you don't want an element to be recorded, and any of its children add this class to it `doNotRecord`
 
+#VanillaJsApp
+
+This just records actions in a non framework environment in the /demo/VanillaJsApp application. 
+This will always be here extinct, other frameworks come and go.
+
 #Angular
 
 Include this line in your page
 
 `<script src="dist/emberTestRecorder.js" data-framework="angular"></script>`
 
-##Testing
+##Running the Angular demo app
 
 The Angular todo app has been copied to demo/angular-1-TODO. The test recorder has been added to this also via a symlink 
 to the /dist folder which contains the webpack build of the test recorder.
@@ -48,6 +54,10 @@ You can run the angular todo app with this, which will start up an express serve
 
 `npm run demo-angular`
 
+
+##Running the Angular protractor test
+
+
 This uses the basicConf.js to run a single file ('test-recorder-spec.js'), you can paste the generated test code into there
 
 You need to start webdriver:
@@ -56,22 +66,36 @@ You need to start webdriver:
 then run protractor with :
 `npm run demo-angular-test`
 
+# React
+
+Include this line in your page
+
+`<script src="dist/emberTestRecorder.js" data-framework="react"></script>`
+
+##Running the React demo app
+
+`npm run demo-react`
+
+##Running the React protractor test
+
+This uses the react/basicConf.js to run a single file ('test-recorder-spec.js'), you can paste the generated test code into there
+
+You need to start webdriver:
+`npm run webdriver`
+
+then run protractor with :
+`npm run demo-react-test`
+
 
 # Ember
 
-To use this, simply include this line of code someone in your app, I recommend in your `app.js`:
+To use this, simply include this line of code someone in your ember-cli, I recommend in your `app.js`:
 
 ```js
 import main from 'ember-cli-test-recorder/main';// jshint ignore:line
 ```
 Note: we use jshint ignore:line as we don't actually do anything with the main object, it sets everything up by itself
 
-
-# React
-
-Include this line in your page
-
-`<script src="dist/emberTestRecorder.js" data-framework="react"></script>`
 
 # Angular 2 
 
@@ -81,8 +105,9 @@ comming soon!
 * Allow selects to be automated
 * Allow more complex click actions like the steps to click on inputs like select2 to be recorded
 * Ignore clicks on ember elements with no effect
-* Get mutations to work with async effects (use Bluebird + promise api)
-
+* Create codes for key-presses 
+* Get mutations to work with async effects more accurately with performance api
+* create tests for changes of lengths in lists
 
 ##TIPS
 
