@@ -4,7 +4,7 @@
 /dist/*hot-update*
 
 # dependencies
-/node_modules
+**/node_modules
 /bower_components
 
 # misc

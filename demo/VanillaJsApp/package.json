@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "babel-core": "^5.8.22",
+    "es6-module-loader": "^0.17.6",
+    "object.observe": "^0.2.4",
+    "qunitjs": "^1.18.0"
+  }
+}
