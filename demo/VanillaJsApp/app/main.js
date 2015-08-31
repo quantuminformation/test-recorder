@@ -1,4 +1,4 @@
-import ShoppingCart from './shoppingCart'
+import ShoppingCart from './shoppingCart.js'
 
 export class Main {
   constructor() {
