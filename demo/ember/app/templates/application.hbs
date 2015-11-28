@@ -1,3 +1,16 @@
-<h2 id="title">Welcome to Ember</h2>
-
+<header>
+    <h1>Basic Inputs</h1>
+    <p>The purpose of this page is to check that different inputs can be automated in acceptance tests</p>
+    <!--this has no id to check if test recorder prints out html path for selector-->
+    <button type="button" {{action 'goToIndexRoute'}}
+            class=""
+            >
+        <span class=""></span>&nbsp;Go to Index Route
+    </button>
+    <button type="button" {{action 'goToFooRoute'}}
+            class=""
+            >
+        <span class=""></span>&nbsp;Go to Foo Route
+    </button>
+</header>
 {{outlet}}
