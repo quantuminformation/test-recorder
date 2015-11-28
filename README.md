@@ -9,6 +9,14 @@ qunit or protractor. The idea is to save you time writing these tests by hand.
 You should only add the relevant script to your app when your app behaves as
 expected (happy flow) as then you will have the tests generated for expected behaviour.
 
+#Setup
+
+If you want to run the protractor tests you will need to do the following:
+* Install protactor `npm install -g protractor` 
+* Update webdriver `webdriver-manager update`
+* Start webdriver `webdriver-manager start`
+
+
 #Current UI interactions that are recorded for acceptance tests:
 
 * Button clicks, they also generate andThen code blocks. 
@@ -32,10 +40,31 @@ andThen(function () {
 
 If you don't want an element to be recorded, and any of its children add this class to it `doNotRecord`
 
-#VanillaJsApp
+#Vanilla (No framework/native js)
 
 This just records actions in a non framework environment in the /demo/VanillaJsApp application. 
-This will always be here extinct, other frameworks come and go.
+This will always be here, other frameworks come and go.
+
+
+##Running the Vanilla demo app
+
+The first thing you need to do is install the local npm dependencies in ./demo/VanillaJsApp
+
+You can run 
+
+`npm run demo-angular`
+
+
+##Running the Vanilla test
+
+
+This uses the basicConf.js to run a single file ('test-recorder-spec.js'), you can paste the generated test code into there
+
+You need to start webdriver:
+`npm run webdriver`
+
+then run protractor with :
+`npm run vanilla-test`
 
 #Angular
 
@@ -108,6 +137,7 @@ comming soon!
 * Create codes for key-presses 
 * Get mutations to work with async effects more accurately with performance api
 * create tests for changes of lengths in lists
+* Generate cucumber specs
 
 ##TIPS
 

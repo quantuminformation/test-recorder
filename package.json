@@ -6,10 +6,12 @@
   "scripts": {
     "test": "test",
     "webdriver": "webdriver-manager start --standalone",
-    "demo-angular": "node demo/angular-1-TODO/server.js",
-    "demo-angular-test": "protractor demo/angular-1-TODO/basicConf.js ",
-    "demo-react": "node demo/react/server.js",
-    "demo-react-test": "protractor demo/react/basicConf.js "
+    "vanilla": "node demo/vanilla/server.js",
+    "vanilla-test": "protractor demo/vanilla/basicConf.js",
+    "angular": "node demo/angular-1-TODO/server.js",
+    "angular-test": "protractor demo/angular-1-TODO/basicConf.js ",
+    "react": "node demo/react/server.js",
+    "react-test": "protractor demo/react/basicConf.js "
   },
   "repository": {
     "type": "git",
@@ -34,5 +36,6 @@
     "node-libs-browser": "^0.5.2",
     "style-loader": "^0.12.3",
     "webpack": "^1.10.1"
-  }
+  },
+  "postinstall": "ln -s ../../dist demo/VanillaJsApp/dist"
 }

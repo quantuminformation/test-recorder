@@ -17,7 +17,7 @@ exports.config = {
 
   capabilities: {'browserName': 'chrome'},
 
-  baseUrl: 'http://localhost:' + ( '8082'),
+  baseUrl: 'http://localhost:' +  '8082',
 
   jasmineNodeOpts: {
     isVerbose: true,

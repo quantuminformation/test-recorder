@@ -6,10 +6,18 @@ describe('ElementFinder', function() {
   });
 
   it('should return the same result as browser.findElement', function() {
-    $('#new-todo').sendKeys('wer');
-    browser.pause();
 
-    //  expect(e.getAttribute('value')).toEqual("foo")
+
+    $('#newItem').sendKeys('sdg');
+    element('#addBtn').click().then(function(){
+
+    });
+
+    $('#newItem').sendKeys('sdgdrge');
+    element('#addBtn').click().then(function(){
+
+    });
+
   });
 
 })
