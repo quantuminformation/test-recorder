@@ -1,3 +1,6 @@
+
+<a href='https://pledgie.com/campaigns/30176'><img alt='Click here to lend your support to: Integration test recorder for Angular/Ember/React/Vanilla web applications. and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/30176.png?skin_name=chrome' border='0' ></a>
+
 # test-recorder
 This is an ambitious project that aims to record integration tests for different frameworks.
 
