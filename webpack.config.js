@@ -8,7 +8,7 @@ module.exports = {
   },
   output: {
     path: __dirname + "/dist",
-    filename: "emberTestRecorder.js"
+    filename: "TestRecorder.js"
   },
   devtool: "#source-map",
   module: {
