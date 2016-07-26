@@ -1,14 +1,24 @@
 export default class ShoppingCart {
   /**
    *
-   * @param defaults default items
+   * @param defaultsItems default items
    * @param element the element to control
    */
-  constructor(defaults, element) {
-    this.items = defaults;
-    this.element = element;
+  constructor(defaultsItems, element) {
+    this.state = {};
+    this.setInitialState({items: defaultsItems, element: element})
     this.listDisplay = this.element.querySelector('#listDisplay');
     this.initObservers();
+
+    //borrow idea from  react
+  }
+
+  setInitialState(items) {
+    Object.keys(items).forEach(i=>this.state[i] = items[i])
+  }
+
+  setState() {
+
   }
 
   initObservers() {
@@ -23,7 +33,7 @@ export default class ShoppingCart {
       self.addItem(self.element.querySelector('#newItem').value);
     });
     //initial render if we have items + save
-    if(this.items.length){
+    if (this.items.length) {
       self.render();
       localStorage.setItem("items", JSON.stringify(self.items));
     }
