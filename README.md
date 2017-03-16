@@ -1,5 +1,5 @@
-
-<a href='https://pledgie.com/campaigns/30176'><img alt='Click here to lend your support to: Integration test recorder for Angular/Ember/React/Vanilla web applications. and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/30176.png?skin_name=chrome' border='0' ></a>
+#Donations
+If you feel this project would be useful you are most welcome to buy me a coffee! https://ko-fi.com/A325GAE
 
 # test-recorder
 This is an ambitious project that aims to record integration tests for any web application.
@@ -34,15 +34,15 @@ andThen(function () {
 
 If you don't want an element to be recorded, and any of its children add this class to it `doNotRecord`
 
-##Running the Vanilla demo app
+##Running the tests
 
-The first thing you need to do is install the local npm dependencies in ./demo/VanillaJsApp
+First you need to build the project by running `npm i`, then you 
+can open tests/vanillaApp.html in the browser to see the app running with the test recorder UI. This has some basic UI that as you
+interact with, will generate output integration tests.
 
-You can open the vanilla/index.html in the browser to see the app running with the test recorder UI
 
 
 ##Running the Vanilla test
-
 
 This uses the basicConf.js to run a single file ('test-recorder-spec.js'), you can paste the generated test code into there
 

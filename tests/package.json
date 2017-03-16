@@ -1,0 +1,12 @@
+{
+  "name": "typescriptImport",
+  "main": "index.js",
+  "devDependencies": {
+    "css-loader": "^0.26.1",
+    "html-webpack-plugin": "^2.24.1",
+    "ts-loader": "^1.0.0",
+    "typescript": "^2.1.4",
+    "webpack": "2.2.0",
+    "webpack-build-notifier": "^0.1.13"
+  }
+}
