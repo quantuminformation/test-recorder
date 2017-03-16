@@ -3,26 +3,26 @@ import mutationUtils from './MutationUtils';
 import common from './common';
 
 
-export default {
+export class  TestRecorder {
 
-  updateCodeCallback: null,//callback to the component to set the code, we need this here so we can tie into the framework we are automating
-  generatedTestCode: "", //this is sent to what ever wants to receive generated code
-  lastRoute: "",
-  cachedMutations: "", //this stores the changes made from mutations until we want to insert them into the generated code
+  updateCodeCallback: null//callback to the component to set the code, we need this here so we can tie into the framework we are automating
+  generatedTestCode: "" //this is sent to what ever wants to receive generated code
+  lastRoute: ""
+  cachedMutations: "" //this stores the changes made from mutations until we want to insert them into the generated code
 
-  codeOutputDiv: null,//holds the screen for the code
+  codeOutputDiv: null//holds the screen for the code
 
 
-  insertMutationsToGeneratedScript: function (newChanges) {
+  insertMutationsToGeneratedScript(newChanges) {
     this.setGeneratedScript(this.generatedTestCode.replace(common.MUTATIONS_PLACEHOLDER, this.cachedMutations));
     this.cachedMutations = "";
-  },
+  }
 
   /**
    * Stores a result from a mutation
    * @param newChanges
    */
-  storeMutationResult: function (newChanges) {
+  storeMutationResult(newChanges) {
     return (newChanges)=> {
       this.cachedMutations += newChanges;
     }
@@ -33,7 +33,7 @@ export default {
    * @param rootDomNode
    * @param codeOutputDiv The UI that displays the code to the user
    */
-  setupAll: function (rootDomNode, codeOutputDiv) {
+  setupAll(rootDomNode, codeOutputDiv) {
 
     this.codeOutputDiv = codeOutputDiv;
     this.setUpChangeListeners();
@@ -43,18 +43,18 @@ export default {
     mutationUtils.monitorMutations(rootDomNode, this.storeMutationResult);
   },
 
-  setGeneratedScript: function (code) {
+  setGeneratedScript (code) {
     this.generatedTestCode = code;
     //todo perhaps use Object.observe once FF supports it
     this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>';
-  },
-  appendToGeneratedScript: function (code) {
+  }
+  appendToGeneratedScript (code) {
     this.generatedTestCode += code;
     //todo perhaps use Object.observe once FF supports it
     this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>';
-  },
+  }
 
-  setUpOtherListeners: function () {
+  setUpOtherListeners() {
 
     var self = this;
 
@@ -62,7 +62,7 @@ export default {
      * this is used for capturing text input fill-ins
      */
 
-    document.addEventListener('focusout', e => {
+    document.addEventListener('focusout', (e:FocusEvent) => {
       if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
         let newCode = common.currentCodeGenerator.inputTextEdited(self.getPlaybackPath(e), e.target.value);
         self.appendToGeneratedScript(newCode);
@@ -70,7 +70,7 @@ export default {
     });
   },
 
-  setUpChangeListeners: function () {
+  setUpChangeListeners () {
     document.addEventListener("change", (e)=> {
       //setsUpSelect input watching
       if (e.target.localName === "select") {
@@ -108,7 +108,7 @@ export default {
    * We assume that the user doesn't click on the application why async operations are ongoing so we
    * know where to place the changes in the generated code.
    */
-  setUpClickListeners: function () {
+  setUpClickListeners () {
 
     var self = this;
 
@@ -132,7 +132,7 @@ export default {
    * todo Use performance api
    * todo possibly use framework specific hooks to decide when operations finished, ie ember promises for routes
    */
-  awaitMutations: function () {
+  awaitMutations() {
     setTimeout(()=> {
       this.insertMutationsToGeneratedScript();
     }, 500)
@@ -142,7 +142,7 @@ export default {
    *
    * @param e event from the DOM that we want to workout the testing path.
    */
-  getPlaybackPath: function (e) {
+  getPlaybackPath (e) {
     let hasEmberIdRegex = /ember[\d]+/;
     if (e.target.id && !hasEmberIdRegex.test(e.target.id)) {
       return "#" + e.target.id;
@@ -165,12 +165,13 @@ export default {
  * @param element
  * @returns {number}
  */
-function findNthChildIndex(element) {
-  let parent = element.parentNode;
-  if (!parent) {//its the <html> tag
+function findNthChildIndex(element: HTMLElement) {
+  let parent: HTMLElement | Node = element.parentNode;
+  if (!parent) {
     return -1;
   }
-  let children = parent.children;
+  let children = (parent instanceof HTMLElement) ? parent.children : parent.childNodes;
+
   let hasOthers = [].some.call(children, function (elem) {
     return elem.tagName === element.tagName && elem !== element;
   });
