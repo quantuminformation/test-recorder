@@ -1,7 +1,6 @@
 var path = require("path");
 var webpack = require("webpack");
 var WebpackBuildNotifierPlugin = require("webpack-build-notifier");
-var fontMagician = require('postcss-font-magician')
 
 const PATHS = {
   src: path.join(__dirname, './src'),
@@ -11,12 +10,12 @@ const PATHS = {
 module.exports = {
 
   entry: {
-    "smart-terminal": PATHS.src + '/SmartTerminal.ts'
+    "test-recorder": PATHS.src
   },
   output: {
     path: PATHS.build,
     filename: '[name].js',
-    library: 'SmartTerminal',
+    library: 'TestRecorder',
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
@@ -25,7 +24,7 @@ module.exports = {
     loaders: [
       {
         test: /\.ts$/,
-        loader: 'ts-loader'
+        loader: 'awesome-typescript-loader'
       },
       {
         test: /\.p?css$/,

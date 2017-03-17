@@ -1,5 +1,5 @@
 import formattingRules from '../util/formattingRules';
-import common from '../util/common';
+import {TestRecorder} from "../TestRecorder";
 
 export default {
   lastRoute: "",
@@ -20,7 +20,7 @@ export default {
         //todo this needs to be looked at again as it assumes the route can only change after a click event
       this.routeChanged() +
 
-      common.MUTATIONS_PLACEHOLDER + '<br/>' +
+      TestRecorder.MUTATIONS_PLACEHOLDER + '<br/>' +
       '});<br/><br/>';
     return code;
   },

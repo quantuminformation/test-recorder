@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "declaration": true
+  },
+  "lib":["es6"],
+  "exclude": [
+    "node_modules",
+    "demo"
+  ]
+}
+
+

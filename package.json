@@ -26,19 +26,19 @@
   "devDependencies": {
     "autoprefixer": "^6.5.4",
     "awesome-typescript-loader": "^3.0.0-beta.18",
-    "css-loader": "^0.26.1",
+    "css-loader": "^0.27.3",
     "css-variables": "^0.1.0",
     "html-webpack-plugin": "^2.24.1",
     "postcss-calc": "^5.3.1",
-    "postcss-css-variables": "^0.6.0",
+    "postcss-css-variables": "^0.7.0",
     "postcss-custom-media": "^5.0.1",
     "postcss-import": "^9.1.0",
     "postcss-loader": "^1.2.2",
     "postcss-nested": "^1.0.0",
-    "style-loader": "^0.13.1",
+    "style-loader": "^0.14.1",
     "typescript": "^2.1.4",
-    "vanilla-typescript": "^0.1.0",
-    "webpack": "2.2.0",
+    "vanilla-typescript": "^0.3.1",
+    "webpack": "2.2.1",
     "webpack-build-notifier": "^0.1.13"
   }
 }

@@ -1,50 +1,50 @@
 import formattingRules from '../util/formattingRules'
-import common from '../util/common'
+import {TestRecorder} from "../TestRecorder";
 
 export class NightwatchGenerator {
   lastRoute: ""
   description: "NightWatch generator"
 
-  constructor(){
+  constructor() {
 
   }
 
   //todo decide what to do here
-  initialCode: function () {
-   /* this.lastRoute = this.getCurrentRoute()
+  initialCode() {
+    /* this.lastRoute = this.getCurrentRoute()
 
-    var code =
-      "beforeEach(function() {<br>" +
-      formattingRules.indentation + "browser.get('" + this.lastRoute + "')<br>" +
-      "})<br>"
+     var code =
+     "beforeEach(function() {<br>" +
+     formattingRules.indentation + "browser.get('" + this.lastRoute + "')<br>" +
+     "})<br>"
 
-    return code*/
+     return code*/
     return ""
   }
 
-  selectChange (queryPath, newSelectedIndex) {
+  selectChange(queryPath, newSelectedIndex) {
     return "select triggered" + queryPath + newSelectedIndex
   }
 
-  clickHappened (queryPath) {
+  clickHappened(queryPath) {
     var code = "element('" + queryPath + "')click().then(function(){<br/>" +
 
-        //todo this needs to be looked at again as it assumes the route can only change after a click event
+      //todo this needs to be looked at again as it assumes the route can only change after a click event
       this.routeChanged() +
 
-      common.MUTATIONS_PLACEHOLDER + '<br/>' +
+      TestRecorder.MUTATIONS_PLACEHOLDER + '<br/>' +
       '})<br/><br/>'
     return code
   }
 
-  inputTextEdited (queryPath, newValue) {
+  inputTextEdited(queryPath, newValue) {
     return "$('" + queryPath + "').sendKeys('" + newValue + "')<br/>"
   }
 
-  routeChanged () {
+  routeChanged() {
 
     if (this.lastRoute !== this.getCurrentRoute()) {
-      this.lastRoute = this.getCurrentRoute()
+    //x  this.lastRoute = this.getCurrentRoute()
       let code = formattingRules.indentation + 'assert.equal(currentRouteName(), "' +
         this.getCurrentRoute() + '", "The page navigates to ' + this.getCurrentRoute() +
         ' on button click")<br/>'
@@ -53,19 +53,20 @@ export class NightwatchGenerator {
     return ''
   }
 
-  getCurrentRoute () {
+  getCurrentRoute() {
     let isIndex = window.location.pathname === '/'
     var pathArray = window.location.pathname.split('/')
     return isIndex ? 'index' : pathArray[1]
   }
 
-  elementAdded (id) {
+  elementAdded(id) {
     return `${formattingRules.indentation}expect($('#" + ${id} + "').isDisplayed()).toBe(true) '<br/>'"`
   }
-  elementRemoved (id) {
+
+  elementRemoved(id) {
     return formattingRules.indentation + "expect($('#" + id + "').isDisplayed()).toBe(false) '<br/>'"
 
 
-
+  }
 }
 
