@@ -31,27 +31,18 @@ export class TestRecorder {
     document.body.appendChild(ui);
 
     let codeOutputDiv = document.getElementById("generatedScript");
-    this.setupAll(rootDomNode, codeOutputDiv);
-  }
-
-  insertMutationsToGeneratedScript() {
-    this.setGeneratedScript(this.generatedTestCode.replace(TestRecorder.MUTATIONS_PLACEHOLDER, this.cachedMutations))
-    this.cachedMutations = ""
-  }
-
-  /**
-   * Wires up everything
-   * @param rootDomNode
-   * @param codeOutputDiv The UI that displays the code to the user
-   */
-  setupAll(rootDomNode, codeOutputDiv) {
-
     this.hostElement = codeOutputDiv
     this.setUpChangeListeners()
     this.setUpClickListeners()
     this.setUpOtherListeners()
     //this will iterate through this node and watch for changes and store them until we want to display them
     this.addObserverForTarget(rootDomNode)
+    this.setGeneratedScript(this.currentCodeGenerator.initialCode())
+  }
+
+  insertMutationsToGeneratedScript() {
+    this.setGeneratedScript(this.generatedTestCode.replace(TestRecorder.MUTATIONS_PLACEHOLDER, this.cachedMutations))
+    this.cachedMutations = ""
   }
 
   setGeneratedScript(code) {
@@ -139,9 +130,9 @@ export class TestRecorder {
    * todo possibly use framework specific hooks to decide when operations finished, ie ember promises for routes
    */
   awaitMutations() {
-    setTimeout(() => {
+    setTimeout(function () {
       this.insertMutationsToGeneratedScript()
-    }, 500)
+    }.bind(this), 500)
   }
 
   /**

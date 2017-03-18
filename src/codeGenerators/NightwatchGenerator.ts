@@ -2,16 +2,17 @@ import formattingRules from '../util/formattingRules'
 import {TestRecorder} from "../TestRecorder";
 
 export class NightwatchGenerator {
-  lastRoute: ""
-  description: "NightWatch generator"
+  lastRoute: string = ""
+  description: string = "NightWatch generator"
 
   constructor() {
 
   }
 
   initialCode(): string {
-    return `'Demo test Google' : function (client) {
-    client`
+    return `
+'Demo test Google' : function (client) {
+${formattingRules.indentation}client`
 
   }
 
@@ -20,9 +21,10 @@ export class NightwatchGenerator {
   }
 
   clickHappened(queryPath) {
-    var code = `.click('${queryPath}').pause(500){<br/>
-      ${TestRecorder.MUTATIONS_PLACEHOLDER}<br/>
-      <br/><br/>'`
+    var code = `
+${formattingRules.indentationX2}.click('${queryPath}')
+${formattingRules.indentationX2}.pause(500){
+      ${TestRecorder.MUTATIONS_PLACEHOLDER}`
     return code
   }
 
@@ -49,13 +51,12 @@ export class NightwatchGenerator {
   }
 
   elementAdded(id) {
+    console.log('new el')
     return `${formattingRules.indentation}assert.visible('${id}')<br/>`
   }
 
   elementRemoved(id) {
     return formattingRules.indentation + "expect($('#" + id + "').isDisplayed()).toBe(false) '<br/>'"
-
-
   }
 }
 

@@ -1,3 +1,7 @@
 export default {
-  indentation: ' '//2 spaces
+  indentation: '  ',
+  get indentationX2() {
+    return this.indentation + this.indentation
+  }
 };
+
