@@ -36,7 +36,7 @@ export class TestRecorder {
     this.setUpClickListeners()
     this.setUpOtherListeners()
     //this will iterate through this node and watch for changes and store them until we want to display them
-    this.addObserverForTarget(rootDomNode)
+    this.addObserverForTarget(rootDomNode, 0)
     this.setGeneratedScript(this.currentCodeGenerator.initialCode())
   }
 
@@ -137,9 +137,10 @@ export class TestRecorder {
 
   /**
    * Adds observer for target and generates source code
+   * then adds observers for its children recursively
    * @param target
    */
-  addObserverForTarget(target) {
+  addObserverForTarget(target, recursionDepth) {
     let self = this;
     let observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
@@ -156,7 +157,7 @@ export class TestRecorder {
 
         //loop through the above and add observers, we need to do this dynamically
         newMutationsFromAddedNodesArray.forEach(function (node) {
-          self.addObserverForTarget(node); //just drill down 2 levels more
+          self.addObserverForTarget(node, recursionDepth); //just drill down 2 levels more
         });
 
         //this array is used to generate the source code, we filter
@@ -190,32 +191,23 @@ export class TestRecorder {
 
     //this is the only place where observe is called so we can track them here too to disconnect
     observer.observe(target, config);
+    console.log(target)
     this.mutationObserversArr.push(observer);
-    this.addInnerObserversForTarget(target, 0);
-  }
 
+    //Create observers for the children recursively
+    if ((target.children && target.children.length)) {
+      let nextRecursionDepth = recursionDepth + 1;
+      for (let i = 0; target.children && i < target.children.length; i++) {
+        let child = target.children[i];
+        let classListArray = child.classList && Array.prototype.slice.call(child.classList);
+        let hasDoNotRecordClass = classListArray ? (classListArray.indexOf("doNotRecord") !== -1) : false;
 
-  /**
-   * Create observers for the children
-   * Can be used recursively to desired depth, atm this is set to max of 4
-   * @param target
-   */
-  addInnerObserversForTarget(target, currentLevel) {
-    for (let i = 0; target.children && i < target.children.length; i++) {
-      let child = target.children[i];
-      let classListArray = child.classList && Array.prototype.slice.call(child.classList);
-      let hasDoNotRecordClass = classListArray ? (classListArray.indexOf("doNotRecord") !== -1) : false;
-
-      if (!hasDoNotRecordClass) {//abort any recording of this dom tree
-        this.addObserverForTarget(child);
-        if (currentLevel <= 6) {//todo compare with root ember element
-          let nextLevel = currentLevel + 1;
-          this.addInnerObserversForTarget(child, nextLevel);
+        if (!hasDoNotRecordClass && recursionDepth <= 6 && child.children && child.children.length) {
+          this.addObserverForTarget(child, nextRecursionDepth);
         }
       }
     }
   }
-
 }
 
 
