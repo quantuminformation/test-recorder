@@ -9,17 +9,10 @@ export class NightwatchGenerator {
 
   }
 
-  //todo decide what to do here
-  initialCode() {
-    /* this.lastRoute = this.getCurrentRoute()
+  initialCode(): string {
+    return `'Demo test Google' : function (client) {
+    client`
 
-     var code =
-     "beforeEach(function() {<br>" +
-     formattingRules.indentation + "browser.get('" + this.lastRoute + "')<br>" +
-     "})<br>"
-
-     return code*/
-    return ""
   }
 
   selectChange(queryPath, newSelectedIndex) {
@@ -27,13 +20,9 @@ export class NightwatchGenerator {
   }
 
   clickHappened(queryPath) {
-    var code = "element('" + queryPath + "')click().then(function(){<br/>" +
-
-      //todo this needs to be looked at again as it assumes the route can only change after a click event
-      this.routeChanged() +
-
-      TestRecorder.MUTATIONS_PLACEHOLDER + '<br/>' +
-      '})<br/><br/>'
+    var code = `.click('${queryPath}').pause(500){<br/>
+      ${TestRecorder.MUTATIONS_PLACEHOLDER}<br/>
+      <br/><br/>'`
     return code
   }
 
@@ -44,7 +33,7 @@ export class NightwatchGenerator {
   routeChanged() {
 
     if (this.lastRoute !== this.getCurrentRoute()) {
-    //x  this.lastRoute = this.getCurrentRoute()
+      //x  this.lastRoute = this.getCurrentRoute()
       let code = formattingRules.indentation + 'assert.equal(currentRouteName(), "' +
         this.getCurrentRoute() + '", "The page navigates to ' + this.getCurrentRoute() +
         ' on button click")<br/>'
@@ -60,7 +49,7 @@ export class NightwatchGenerator {
   }
 
   elementAdded(id) {
-    return `${formattingRules.indentation}expect($('#" + ${id} + "').isDisplayed()).toBe(true) '<br/>'"`
+    return `${formattingRules.indentation}assert.visible('${id}')<br/>`
   }
 
   elementRemoved(id) {

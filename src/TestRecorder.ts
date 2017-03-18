@@ -40,16 +40,6 @@ export class TestRecorder {
   }
 
   /**
-   * Stores a result from a mutation
-   * @param newChanges
-   */
-  storeMutationResult(newChanges) {
-    return (newChanges) => {
-      this.cachedMutations += newChanges
-    }
-  }
-
-  /**
    * Wires up everything
    * @param rootDomNode
    * @param codeOutputDiv The UI that displays the code to the user
@@ -79,7 +69,7 @@ export class TestRecorder {
   setUpOtherListeners() {
     document.addEventListener('focusout', (e: any) => {
       if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
-        let newCode = this.currentCodeGenerator.inputTextEdited(this.getPlaybackPath(e), e.target.value)
+        let newCode = this.currentCodeGenerator.inputTextEdited(getPlaybackPath(e), e.target.value)
         this.appendToGeneratedScript(newCode)
       }
     })
@@ -91,7 +81,7 @@ export class TestRecorder {
       //setsUpSelect input watching
       if (e.target.localName === "select") {
         let newSelectedIndex = e.target.selectedIndex
-        let newCode = this.currentCodeGenerator.selectChange(this.getPlaybackPath(e), newSelectedIndex)
+        let newCode = this.currentCodeGenerator.selectChange(getPlaybackPath(e), newSelectedIndex)
         this.appendToGeneratedScript(newCode)
       }
     })
@@ -136,7 +126,7 @@ export class TestRecorder {
         return
       }
 
-      var newTestPrint = this.currentCodeGenerator.clickHappened(this.getPlaybackPath(e))
+      var newTestPrint = this.currentCodeGenerator.clickHappened(getPlaybackPath(e))
       this.appendToGeneratedScript(newTestPrint)
       this.awaitMutations()
     })
@@ -153,28 +143,6 @@ export class TestRecorder {
       this.insertMutationsToGeneratedScript()
     }, 500)
   }
-
-  /**
-   *
-   * @param e event from the DOM that we want to workout the testing path.
-   */
-  getPlaybackPath(e) {
-    let hasEmberIdRegex = /ember[\d]+/
-    if (e.target.id && !hasEmberIdRegex.test(e.target.id)) {
-      return "#" + e.target.id
-    } else {
-      let path = e.path.reverse().slice(2) //remove the window and document path sections
-      let fullPath = path.map(function (element) {
-        // we need to make each path segment more specific if other siblings of the same type exist
-        let index = findNthChildIndex(element)
-        return element.localName + (index !== -1 ? ':nth-child(' + index + ')' : '')
-      }).join('>')//join all the segments for the query selector
-      console.log(fullPath)
-      return fullPath
-    }
-  }
-
-
 
   /**
    * Adds observer for target and generates source code
@@ -280,4 +248,32 @@ function findNthChildIndex(element: HTMLElement) {
     return -1
   }
   return Array.from(children).indexOf(element) + 1//because nth child is 1 indexed
+}
+
+/**
+ *
+ * @param e event from the DOM that we want to workout the testing path.
+ */
+function getPlaybackPath(e: any) {
+  if (e.target.id) {
+    return "#" + e.target.id
+  } else {
+    let path = e.path
+
+    //get index of body, ignore window , document shadow etc
+    let length = e.path.length
+    for (var i = 0; i < length; i++) {
+      if (path[i].tagName === 'BODY') {
+        path = path.slice(0, i + 1).reverse()
+        break
+      }
+    }
+    let fullPath = path.map(function (element) {
+      // we need to make each path segment more specific if other siblings of the same type exist
+      let index = findNthChildIndex(element)
+      return element.localName + (index !== -1 ? ':nth-child(' + index + ')' : '')
+    }).join('>')//join all the segments for the query selector
+    console.log(fullPath)
+    return fullPath
+  }
 }

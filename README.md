@@ -14,9 +14,9 @@ expected (happy flow) as then you will have the tests generated for this. You ca
 
 #Current UI interactions that are recorded for acceptance tests:
 
-* Button clicks, they also generate andThen code blocks. 
-* records text input fillins
-* Changes in DOM additions/removals, only items with ID's are recorded and that don't have the doNotRecord css class.
+* Button clicks
+* Text input 
+* Changes in DOM additions/removals
 
 #Notes
 
@@ -36,13 +36,9 @@ If you don't want an element to be recorded, and any of its children add this cl
 
 ##Running the tests
 
-First you need to build the project by running `npm i`, then you 
-can open tests/vanillaApp.html in the browser to see the app running with the test recorder UI. This has some basic UI that as you
+First you need to build the test project by running `npm i` and `webpack` inside /tests, then you 
+can open tests/build/ in the browser to see the app running with the test recorder UI. This has some basic UI that as you
 interact with, will generate output integration tests.
-
-
-
-##Running the Vanilla test
 
 This uses the basicConf.js to run a single file ('test-recorder-spec.js'), you can paste the generated test code into there
 
@@ -52,26 +48,13 @@ You need to start webdriver:
 then run protractor with :
 `npm run vanilla-test`
 
-# React
+# Using the test-recorder in your apps
 
-Include this line in your page
-
-`<script src="dist/emberTestRecorder.js" data-framework="react"></script>`
-
-##Running the React demo app
-
-`npm run demo-react`
-
-##Running the React protractor test
-
-This uses the react/basicConf.js to run a single file ('test-recorder-spec.js'), you can paste the generated test code into there
-
-You need to start webdriver:
-`npm run webdriver`
-
-then run protractor with :
-`npm run demo-react-test`
-
+`<script src="node_modules/test-recorder/test-recorder.js"></script>
+<script type="text/javascript">
+  var testRecorder = new TestRecorder.TestRecorder()
+</script>
+`
 
 # Ember
 
@@ -100,4 +83,4 @@ generated code.
 
 #Browser compatibility
 
-Chrome + Firefox + Edge
+Chrome + Firefox + Edge + IE11
