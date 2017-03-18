@@ -56,7 +56,7 @@ then run protractor with :
 </script>
 `
 
-# Ember
+# Ember (WIP)
 
 To use this, simply include this line of code someone in your ember-cli, I recommend in your `app.js`:
 

@@ -24,7 +24,7 @@ ${formattingRules.indentation}client`
     var code = `
 ${formattingRules.indentationX2}.click('${queryPath}')
 ${formattingRules.indentationX2}.pause(500){
-      ${TestRecorder.MUTATIONS_PLACEHOLDER}`
+${formattingRules.indentationX2}${TestRecorder.MUTATIONS_PLACEHOLDER}`
     return code
   }
 

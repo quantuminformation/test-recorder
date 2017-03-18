@@ -11,9 +11,9 @@ export class TestRecorder {
 
   mutationObserversArr: MutationObserver[] = []
 
-  generatedTestCode: "" //this is sent to what ever wants to receive generated code
+  generatedTestCode: string = "" //this is sent to what ever wants to receive generated code
   lastRoute: ""
-  cachedMutations: "" //this stores the changes made from mutations until we want to insert them into the generated code
+  cachedMutations: string = "" //this stores the changes made from mutations until we want to insert them into the generated code
   currentCodeGenerator = new NightwatchGenerator()
   hostElement: HTMLElement
 
@@ -141,9 +141,8 @@ export class TestRecorder {
    * @param target
    */
   addObserverForTarget(target, recursionDepth) {
-    let self = this;
-    let observer = new MutationObserver(function (mutations) {
-      mutations.forEach(function (mutation) {
+    let observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
 
         let addedNodesTestText = "";
         let removedNodesTestText = "";
@@ -156,8 +155,8 @@ export class TestRecorder {
         let newMutationsFromAddedNodesArray = addedNodesArray.filter(mutationUtils.filterDoNotRecordAndWhiteSpace);
 
         //loop through the above and add observers, we need to do this dynamically
-        newMutationsFromAddedNodesArray.forEach(function (node) {
-          self.addObserverForTarget(node, recursionDepth); //just drill down 2 levels more
+        newMutationsFromAddedNodesArray.forEach((node) => {
+          this.addObserverForTarget(node, recursionDepth); //just drill down 2 levels more
         });
 
         //this array is used to generate the source code, we filter
@@ -175,11 +174,11 @@ export class TestRecorder {
           return;
         }
 
-        addedNodesArray.forEach(function (node) {
+        addedNodesArray.forEach((node) => {
           addedNodesTestText += this.currentCodeGenerator.elementAdded(node.id);
         });
 
-        removedNodesArray.forEach(function (node) {
+        removedNodesArray.forEach((node) => {
           removedNodesTestText += this.currentCodeGenerator.elementRemoved(node.id);
         });
 
@@ -202,7 +201,7 @@ export class TestRecorder {
         let classListArray = child.classList && Array.prototype.slice.call(child.classList);
         let hasDoNotRecordClass = classListArray ? (classListArray.indexOf("doNotRecord") !== -1) : false;
 
-        if (!hasDoNotRecordClass && recursionDepth <= 6 && child.children && child.children.length) {
+        if (!hasDoNotRecordClass && recursionDepth <= 6) {
           this.addObserverForTarget(child, nextRecursionDepth);
         }
       }

@@ -1,8 +1,11 @@
 {
   "name": "test-recorder",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "to record integration tests for different frameworks.",
-  "main": "index.js",
+  "files": [
+    "build/test-recorder.js"
+  ],
+  "main": "build/test-recorder.js",
   "scripts": {
     "test": "test",
     "webdriver": "webdriver-manager start --standalone",
