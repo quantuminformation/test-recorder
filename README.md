@@ -34,11 +34,13 @@ andThen(function () {
 
 If you don't want an element to be recorded, and any of its children add this class to it `doNotRecord`
 
-##Running the tests
+##Nightwatch tests
 
-First you need to build the test project by running `npm i` and `webpack` inside /tests, then you 
+I have an example app inside /tests. First you need to build the test project by running `npm i` and `webpack` inside /tests, then you 
 can open tests/build/ in the browser to see the app running with the test recorder UI. This has some basic UI that as you
 interact with, will generate output integration tests.
+
+Once you have the tests generated you can past the code into the actual test file: I've made a sample one called index.test.js
 
 This uses the basicConf.js to run a single file ('test-recorder-spec.js'), you can paste the generated test code into there
 

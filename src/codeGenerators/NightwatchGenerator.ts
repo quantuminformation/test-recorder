@@ -23,7 +23,7 @@ ${formattingRules.indentation}client`
   clickHappened(queryPath) {
     var code = `
 ${formattingRules.indentationX2}.click('${queryPath}')
-${formattingRules.indentationX2}.pause(500){
+${formattingRules.indentationX2}.pause(500)
 ${formattingRules.indentationX2}${TestRecorder.MUTATIONS_PLACEHOLDER}`
     return code
   }
