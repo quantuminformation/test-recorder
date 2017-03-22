@@ -3,8 +3,10 @@ import mutationUtils from './util/MutationUtils'
 import {NightwatchGenerator} from "./codeGenerators/NightwatchGenerator"
 import './styles/app.pcss'
 import {copyTextToClipboard} from './util/clipboard'
-import  Prism from 'prismjs'
+import  'prismjs'
+import  'prismjs/components/prism-javascript'
 import {ICodeGenerator} from "./codeGenerators/ICodeGenerator";
+declare var Prism
 
 /**
  * Default tests that are generated are for Nightwatch
@@ -81,6 +83,7 @@ export class TestRecorder {
     this.setGeneratedScript(this.generatedTestCode.replace(TestRecorder.MUTATIONS_PLACEHOLDER, this.cachedMutations))
     this.cachedMutations = ""
   }
+
 
   setGeneratedScript(code) {
     this.generatedTestCode = code
