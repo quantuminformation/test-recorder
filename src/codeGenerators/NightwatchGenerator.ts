@@ -9,12 +9,12 @@ export class NightwatchGenerator {
 
   }
 
-  initialCode(): string {
+/*  initialCode(): string {
     return `
 'Demo test Google' : function (client) {
 ${formattingRules.indentation}client`
 
-  }
+  }*/
 
   selectChange(queryPath, newSelectedIndex) {
     return "select triggered" + queryPath + newSelectedIndex

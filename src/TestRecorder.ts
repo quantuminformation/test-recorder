@@ -2,6 +2,7 @@
 import mutationUtils from './util/MutationUtils'
 import {NightwatchGenerator} from "./codeGenerators/NightwatchGenerator"
 import './styles/app.pcss'
+import {copyTextToClipboard} from './util/clipboard'
 
 /**
  * Default tests that are generated are for Nightwatch
@@ -17,27 +18,61 @@ export class TestRecorder {
   currentCodeGenerator = new NightwatchGenerator()
   hostElement: HTMLElement
 
+
   static MUTATIONS_PLACEHOLDER = "[MUTATIONS_PLACEHOLDER]"
+  static DO_NOT_RECORD = "doNotRecord"
 
   constructor() {
     let rootDomNode = document.querySelector('body');
     let ui = document.createElement('div');
     ui.innerHTML =
       `<div id="testRecorderUI" class="doNotRecord">
-    <div id="testRecorderUI-Title">${this.currentCodeGenerator.description}</div> 
+    <div id="testRecorderUI-Title">${this.currentCodeGenerator.description} <button id="copy">Copy</button></div> 
     <div id="generatedScript"></div> 
     </div>`
 
-    document.body.appendChild(ui);
+    document.body.appendChild(ui.firstChild);
 
     let codeOutputDiv = document.getElementById("generatedScript");
     this.hostElement = codeOutputDiv
     this.setUpChangeListeners()
-    this.setUpClickListeners()
     this.setUpOtherListeners()
     //this will iterate through this node and watch for changes and store them until we want to display them
     this.addObserverForTarget(rootDomNode, 0)
-    this.setGeneratedScript(this.currentCodeGenerator.initialCode())
+    // this.setGeneratedScript(this.currentCodeGenerator.initialCode())
+    this.addListeners()
+  }
+
+  addListeners() {
+
+    //test recorder UI--------------------------------------------------------------------
+    document.querySelector('#copy').addEventListener('click', () => {
+      copyTextToClipboard(this.hostElement.innerHTML);
+
+    });
+
+    // on the users app being tests----------------------------------------------------------------
+    document.addEventListener('click', (e: any) => {
+
+      let path = getPathUpTillBody(e.path)
+
+      if (!path || path.length === 0) { //eg clicking outside the body if the app is less than the height of the window
+        return
+      }
+      if (isAnyElementInPathClassOrChildOfClass(path, TestRecorder.DO_NOT_RECORD)) {
+        return
+      }
+      if (e.target.localName === 'input' && e.target.type === 'text' || //on listen to focus-out for these
+        e.target.localName === 'html' ||  //don't want to record clicking outside the app'
+        e.target.type === 'select-one') { // selects handled elsewhere
+        return
+      }
+
+      var newTestPrint = this.currentCodeGenerator.clickHappened(getPlaybackPath(e))
+      this.appendToGeneratedScript(newTestPrint)
+      this.awaitMutations()
+    })
+
   }
 
   insertMutationsToGeneratedScript() {
@@ -98,31 +133,6 @@ export class TestRecorder {
 
    }*/
 
-
-  /**
-   * handle simple click events here, not things like selects, date pickers etc
-   * We assume that the user doesn't click on the application why async operations are ongoing so we
-   * know where to place the changes in the generated code.
-   */
-  setUpClickListeners() {
-
-    var self = this
-
-    document.addEventListener('click', (e: any) => {
-
-      if (e.target.localName === 'input' && e.target.type === 'text' || //on listen to focus-out for these
-        e.target.localName === 'html' ||  //don't want to record clicking outside the app'
-        e.target.localName === 'pre' || //don't want to recorded the output code'
-        e.target.type === 'select-one') { // so listen to clicks on select inputs, we handle this with triggers
-        return
-      }
-
-      var newTestPrint = this.currentCodeGenerator.clickHappened(getPlaybackPath(e))
-      this.appendToGeneratedScript(newTestPrint)
-      this.awaitMutations()
-    })
-
-  }
 
   /**
    * Wait for a bit then insert changed into the last placeholder
@@ -199,7 +209,7 @@ export class TestRecorder {
       for (let i = 0; target.children && i < target.children.length; i++) {
         let child = target.children[i];
         let classListArray = child.classList && Array.prototype.slice.call(child.classList);
-        let hasDoNotRecordClass = classListArray ? (classListArray.indexOf("doNotRecord") !== -1) : false;
+        let hasDoNotRecordClass = classListArray ? (classListArray.indexOf(TestRecorder.DO_NOT_RECORD) !== -1) : false;
 
         if (!hasDoNotRecordClass && recursionDepth <= 6) {
           this.addObserverForTarget(child, nextRecursionDepth);
@@ -240,16 +250,9 @@ function getPlaybackPath(e: any) {
   if (e.target.id) {
     return "#" + e.target.id
   } else {
-    let path = e.path
+    let path = getPathUpTillBody(e.path)
 
-    //get index of body, ignore window , document shadow etc
-    let length = e.path.length
-    for (var i = 0; i < length; i++) {
-      if (path[i].tagName === 'BODY') {
-        path = path.slice(0, i + 1).reverse()
-        break
-      }
-    }
+
     let fullPath = path.map(function (element) {
       // we need to make each path segment more specific if other siblings of the same type exist
       let index = findNthChildIndex(element)
@@ -257,5 +260,24 @@ function getPlaybackPath(e: any) {
     }).join('>')//join all the segments for the query selector
     console.log(fullPath)
     return fullPath
+  }
+}
+
+function isAnyElementInPathClassOrChildOfClass(path: HTMLElement[], className) {
+  for (var i = 0; i < path.length; i++) {
+    if (Array.from(path[i].classList).indexOf(className) !== -1) {
+      return true
+    }
+  }
+  return false
+}
+
+function getPathUpTillBody(path) {
+  //get index of body, ignore window , document shadow etc
+  let length = path.length
+  for (var i = 0; i < length; i++) {
+    if (path[i].tagName === 'BODY') {
+      return path.slice(0, i + 1).reverse()
+    }
   }
 }
