@@ -1,7 +1,8 @@
 import formattingRules from '../util/formattingRules'
 import {TestRecorder} from "../TestRecorder";
+import {ICodeGenerator} from "./ICodeGenerator";
 
-export class NightwatchGenerator {
+export class NightwatchGenerator implements ICodeGenerator{
   lastRoute: string = ""
   description: string = "NightWatch generator"
 
@@ -20,7 +21,7 @@ ${formattingRules.indentation}client`
     return "select triggered" + queryPath + newSelectedIndex
   }
 
-  clickHappened(queryPath) {
+  clickHappened(queryPath:string) {
     var code = `
 ${formattingRules.indentationX2}.click('${queryPath}')
 ${formattingRules.indentationX2}.pause(500)
@@ -50,12 +51,12 @@ ${formattingRules.indentationX2}${TestRecorder.MUTATIONS_PLACEHOLDER}`
     return isIndex ? 'index' : pathArray[1]
   }
 
-  elementAdded(id) {
+  elementAdded(id) :string{
     console.log('new el')
     return `${formattingRules.indentation}assert.visible('${id}')<br/>`
   }
 
-  elementRemoved(id) {
+  elementRemoved(id) :string{
     return formattingRules.indentation + "expect($('#" + id + "').isDisplayed()).toBe(false) '<br/>'"
   }
 }

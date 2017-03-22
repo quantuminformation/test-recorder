@@ -26,6 +26,10 @@ module.exports = {
         loader: 'ts-loader'
       },
       {
+        test: /\.js$/,
+        loader: 'babel-loader'
+      },
+      {
         test: /\.p?css$/,
         loaders: [
           'style-loader',

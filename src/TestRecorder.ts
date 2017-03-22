@@ -3,19 +3,21 @@ import mutationUtils from './util/MutationUtils'
 import {NightwatchGenerator} from "./codeGenerators/NightwatchGenerator"
 import './styles/app.pcss'
 import {copyTextToClipboard} from './util/clipboard'
+import  Prism from 'prismjs'
+import {ICodeGenerator} from "./codeGenerators/ICodeGenerator";
 
 /**
  * Default tests that are generated are for Nightwatch
  */
 export class TestRecorder {
 
+  // defaults
+  currentCodeGenerator: ICodeGenerator = new NightwatchGenerator()
 
   mutationObserversArr: MutationObserver[] = []
-
   generatedTestCode: string = "" //this is sent to what ever wants to receive generated code
   lastRoute: ""
   cachedMutations: string = "" //this stores the changes made from mutations until we want to insert them into the generated code
-  currentCodeGenerator = new NightwatchGenerator()
   hostElement: HTMLElement
 
 
@@ -28,7 +30,7 @@ export class TestRecorder {
     ui.innerHTML =
       `<div id="testRecorderUI" class="doNotRecord">
     <div id="testRecorderUI-Title">${this.currentCodeGenerator.description} <button id="copy">Copy</button></div> 
-    <div id="generatedScript"></div> 
+    <div id="generatedScript" class="language-javascript"></div> 
     </div>`
 
     document.body.appendChild(ui.firstChild);
@@ -90,6 +92,7 @@ export class TestRecorder {
     this.generatedTestCode += code
     //todo perhaps use Object.observe once FF supports it
     this.hostElement.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
+    Prism.highlightAll()
   }
 
   setUpOtherListeners() {

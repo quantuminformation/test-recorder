@@ -36,6 +36,7 @@
     "postcss-import": "^9.1.0",
     "postcss-loader": "^1.2.2",
     "postcss-nested": "^1.0.0",
+    "prismjs": "^1.6.0",
     "style-loader": "^0.15.0",
     "typescript": "^2.1.4",
     "vanilla-typescript": "^0.3.1",
