@@ -51,7 +51,7 @@ export class TestRecorder {
 
     //test recorder UI--------------------------------------------------------------------
     document.querySelector('#copy').addEventListener('click', () => {
-      copyTextToClipboard(this.hostElement.innerHTML);
+      copyTextToClipboard(this.hostElement.textContent);
 
     });
 
