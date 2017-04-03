@@ -3,5 +3,4 @@ export default {
   get indentationX2() {
     return this.indentation + this.indentation
   }
-};
-
+}

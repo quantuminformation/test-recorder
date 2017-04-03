@@ -8,7 +8,8 @@
   "main": "build/test-recorder.js",
   "scripts": {
     "test": "test",
-    "webdriver": "webdriver-manager start --standalone"
+    "webdriver": "webdriver-manager start --standalone",
+    "lint": "tslint src/**/*.ts"
   },
   "repository": {
     "type": "git",
@@ -39,9 +40,13 @@
     "postcss-nested": "^1.0.0",
     "prismjs": "^1.6.0",
     "style-loader": "^0.15.0",
+    "tslint": "^5.0.0",
     "typescript": "^2.1.4",
     "vanilla-typescript": "^0.3.1",
     "webpack": "2.3.0",
     "webpack-build-notifier": "^0.1.13"
+  },
+  "dependencies": {
+    "tslint-config-standard": "^4.0.0"
   }
 }

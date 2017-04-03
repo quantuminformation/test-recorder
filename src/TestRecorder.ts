@@ -1,11 +1,11 @@
 //todo perhaps use typescript to have these as interface implementation
 import mutationUtils from './util/MutationUtils'
-import {NightwatchGenerator} from "./codeGenerators/NightwatchGenerator"
+import {NightwatchGenerator} from './codeGenerators/NightwatchGenerator'
 import './styles/app.pcss'
 import {copyTextToClipboard} from './util/clipboard'
 import  'prismjs'
 import  'prismjs/components/prism-javascript'
-import {ICodeGenerator} from "./codeGenerators/ICodeGenerator";
+import {ICodeGenerator} from './codeGenerators/ICodeGenerator'
 declare var Prism
 
 /**
@@ -17,27 +17,26 @@ export class TestRecorder {
   currentCodeGenerator: ICodeGenerator = new NightwatchGenerator()
 
   mutationObserversArr: MutationObserver[] = []
-  generatedTestCode: string = "" //this is sent to what ever wants to receive generated code
-  lastRoute: ""
-  cachedMutations: string = "" //this stores the changes made from mutations until we want to insert them into the generated code
+  generatedTestCode: string = '' //this is sent to what ever wants to receive generated code
+  lastRoute: ''
+  cachedMutations: string = '' //this stores the changes made from mutations until we want to insert them into the generated code
   hostElement: HTMLElement
 
+  static MUTATIONS_PLACEHOLDER = '[MUTATIONS_PLACEHOLDER]'
+  static DO_NOT_RECORD = 'doNotRecord'
 
-  static MUTATIONS_PLACEHOLDER = "[MUTATIONS_PLACEHOLDER]"
-  static DO_NOT_RECORD = "doNotRecord"
-
-  constructor() {
-    let rootDomNode = document.querySelector('body');
-    let ui = document.createElement('div');
+  constructor () {
+    let rootDomNode = document.querySelector('body')
+    let ui = document.createElement('div')
     ui.innerHTML =
       `<div id="testRecorderUI" class="doNotRecord">
     <div id="testRecorderUI-Title">${this.currentCodeGenerator.description} <button id="copy">Copy</button></div> 
     <div id="generatedScript" class="language-javascript"></div> 
     </div>`
 
-    document.body.appendChild(ui.firstChild);
+    document.body.appendChild(ui.firstChild)
 
-    let codeOutputDiv = document.getElementById("generatedScript");
+    let codeOutputDiv = document.getElementById('generatedScript')
     this.hostElement = codeOutputDiv
     this.setUpChangeListeners()
     this.setUpOtherListeners()
@@ -47,58 +46,57 @@ export class TestRecorder {
     this.addListeners()
   }
 
-  addListeners() {
+  addListeners () {
 
     //test recorder UI--------------------------------------------------------------------
     document.querySelector('#copy').addEventListener('click', () => {
-      copyTextToClipboard(this.hostElement.textContent);
+      copyTextToClipboard(this.hostElement.textContent)
 
-    });
+    })
 
     // on the users app being tests----------------------------------------------------------------
     document.addEventListener('click', (e: any) => {
 
       let path = getPathUpTillBody(e.path)
 
-      if (!path || path.length === 0) { //eg clicking outside the body if the app is less than the height of the window
+      if (!path || path.length === 0) { // eg clicking outside the body if the app is less than the height of the window
         return
       }
       if (isAnyElementInPathClassOrChildOfClass(path, TestRecorder.DO_NOT_RECORD)) {
         return
       }
       if (e.target.localName === 'input' && e.target.type === 'text' || //on listen to focus-out for these
-        e.target.localName === 'html' ||  //don't want to record clicking outside the app'
+        e.target.localName === 'html' ||  // don't want to record clicking outside the app'
         e.target.type === 'select-one') { // selects handled elsewhere
         return
       }
 
-      var newTestPrint = this.currentCodeGenerator.clickHappened(getPlaybackPath(e))
+      let newTestPrint = this.currentCodeGenerator.clickHappened(getPlaybackPath(e))
       this.appendToGeneratedScript(newTestPrint)
       this.awaitMutations()
     })
 
   }
 
-  insertMutationsToGeneratedScript() {
+  insertMutationsToGeneratedScript () {
     this.setGeneratedScript(this.generatedTestCode.replace(TestRecorder.MUTATIONS_PLACEHOLDER, this.cachedMutations))
-    this.cachedMutations = ""
+    this.cachedMutations = ''
   }
 
-
-  setGeneratedScript(code) {
+  setGeneratedScript (code) {
     this.generatedTestCode = code
     //todo perhaps use Object.observe once FF supports it
     this.hostElement.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
   }
 
-  appendToGeneratedScript(code) {
+  appendToGeneratedScript (code) {
     this.generatedTestCode += code
     //todo perhaps use Object.observe once FF supports it
     this.hostElement.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
     Prism.highlightAll()
   }
 
-  setUpOtherListeners() {
+  setUpOtherListeners () {
     document.addEventListener('focusout', (e: any) => {
       if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
         let newCode = this.currentCodeGenerator.inputTextEdited(getPlaybackPath(e), e.target.value)
@@ -107,11 +105,10 @@ export class TestRecorder {
     })
   }
 
-
-  setUpChangeListeners() {
-    document.addEventListener("change", (e: any) => {
+  setUpChangeListeners () {
+    document.addEventListener('change', (e: any) => {
       //setsUpSelect input watching
-      if (e.target.localName === "select") {
+      if (e.target.localName === 'select') {
         let newSelectedIndex = e.target.selectedIndex
         let newCode = this.currentCodeGenerator.selectChange(getPlaybackPath(e), newSelectedIndex)
         this.appendToGeneratedScript(newCode)
@@ -122,13 +119,12 @@ export class TestRecorder {
   /*  window.addEventListener("hashchange", function (e) {
    console.log("hash")
    alert("hash")
-   })*/
+   })
+   */
 
+// todo figure out how to assert route changes for different frameworks
 
-//todo figure out how to assert route changes for different frameworks
-
-
-  //just examine history changes for now
+  // just examine history changes for now
 
   /* window.onpushstate = function (e) {
    alert("push")
@@ -139,13 +135,12 @@ export class TestRecorder {
 
    }*/
 
-
   /**
    * Wait for a bit then insert changed into the last placeholder
    * todo Use performance api
    * todo possibly use framework specific hooks to decide when operations finished, ie ember promises for routes
    */
-  awaitMutations() {
+  awaitMutations () {
     setTimeout(function () {
       this.insertMutationsToGeneratedScript()
     }.bind(this), 500)
@@ -156,75 +151,74 @@ export class TestRecorder {
    * then adds observers for its children recursively
    * @param target
    */
-  addObserverForTarget(target, recursionDepth) {
+  addObserverForTarget (target, recursionDepth) {
     let observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
 
-        let addedNodesTestText = "";
-        let removedNodesTestText = "";
+        let addedNodesTestText = ''
+        let removedNodesTestText = ''
 
         //convert these to Arrays
-        let addedNodesArray = Array.prototype.slice.call(mutation.addedNodes);
-        let removedNodesArray = Array.prototype.slice.call(mutation.removedNodes);
+        let addedNodesArray = Array.prototype.slice.call(mutation.addedNodes)
+        let removedNodesArray = Array.prototype.slice.call(mutation.removedNodes)
 
         // This array is used to add new mutation Observers from the newly added DOM
-        let newMutationsFromAddedNodesArray = addedNodesArray.filter(mutationUtils.filterDoNotRecordAndWhiteSpace);
+        let newMutationsFromAddedNodesArray = addedNodesArray.filter(mutationUtils.filterDoNotRecordAndWhiteSpace)
 
-        //loop through the above and add observers, we need to do this dynamically
+        // loop through the above and add observers, we need to do this dynamically
         newMutationsFromAddedNodesArray.forEach((node) => {
-          this.addObserverForTarget(node, recursionDepth); //just drill down 2 levels more
-        });
+          this.addObserverForTarget(node, recursionDepth) // just drill down 2 levels more
+        })
 
-        //this array is used to generate the source code, we filter
-        addedNodesArray = addedNodesArray.filter(mutationUtils.filter_DoNotRecord_WhiteSpace_emberID_noID);
-        removedNodesArray = removedNodesArray.filter(mutationUtils.filter_DoNotRecord_WhiteSpace_emberID_noID);
+        // this array is used to generate the source code, we filter
+        addedNodesArray = addedNodesArray.filter(mutationUtils.filter_DoNotRecord_WhiteSpace_emberID_noID)
+        removedNodesArray = removedNodesArray.filter(mutationUtils.filter_DoNotRecord_WhiteSpace_emberID_noID)
 
         if (!addedNodesArray.length && !removedNodesArray.length) {
           //no point continuing in this iteration if nothing of interest
-          return;
+          return
         }
 
-        //mutations should be mutually exclusive?
+        // mutations should be mutually exclusive?
         if (addedNodesArray.length && removedNodesArray.length) {
-          alert("strange");
-          return;
+          alert('strange')
+          return
         }
 
         addedNodesArray.forEach((node) => {
-          addedNodesTestText += this.currentCodeGenerator.elementAdded(node.id);
-        });
+          addedNodesTestText += this.currentCodeGenerator.elementAdded(node.id)
+        })
 
         removedNodesArray.forEach((node) => {
-          removedNodesTestText += this.currentCodeGenerator.elementRemoved(node.id);
-        });
+          removedNodesTestText += this.currentCodeGenerator.elementRemoved(node.id)
+        })
 
-        //this sends this new changes back
+        // this sends this new changes back
         this.cachedMutations += (addedNodesTestText || removedNodesTestText)
-      });
-    });
-    let config = {attributes: true, childList: true, characterData: true};
+      })
+    })
+    let config = {attributes: true, childList: true, characterData: true}
 
-    //this is the only place where observe is called so we can track them here too to disconnect
-    observer.observe(target, config);
+    // this is the only place where observe is called so we can track them here too to disconnect
+    observer.observe(target, config)
     console.log(target)
-    this.mutationObserversArr.push(observer);
+    this.mutationObserversArr.push(observer)
 
-    //Create observers for the children recursively
+    // Create observers for the children recursively
     if ((target.children && target.children.length)) {
-      let nextRecursionDepth = recursionDepth + 1;
+      let nextRecursionDepth = recursionDepth + 1
       for (let i = 0; target.children && i < target.children.length; i++) {
-        let child = target.children[i];
-        let classListArray = child.classList && Array.prototype.slice.call(child.classList);
-        let hasDoNotRecordClass = classListArray ? (classListArray.indexOf(TestRecorder.DO_NOT_RECORD) !== -1) : false;
+        let child = target.children[i]
+        let classListArray = child.classList && Array.prototype.slice.call(child.classList)
+        let hasDoNotRecordClass = classListArray ? (classListArray.indexOf(TestRecorder.DO_NOT_RECORD) !== -1) : false
 
         if (!hasDoNotRecordClass && recursionDepth <= 6) {
-          this.addObserverForTarget(child, nextRecursionDepth);
+          this.addObserverForTarget(child, nextRecursionDepth)
         }
       }
     }
   }
 }
-
 
 /**
  * Gets the nth child index so we can select the element directly
@@ -232,7 +226,7 @@ export class TestRecorder {
  * @param element
  * @returns {number}
  */
-function findNthChildIndex(element: HTMLElement) {
+function findNthChildIndex (element: HTMLElement) {
   let parent: HTMLElement | Node = element.parentNode
   if (!parent) {
     return -1
@@ -252,25 +246,24 @@ function findNthChildIndex(element: HTMLElement) {
  *
  * @param e event from the DOM that we want to workout the testing path.
  */
-function getPlaybackPath(e: any) {
+function getPlaybackPath (e: any) {
   if (e.target.id) {
-    return "#" + e.target.id
+    return '#' + e.target.id
   } else {
     let path = getPathUpTillBody(e.path)
-
 
     let fullPath = path.map(function (element) {
       // we need to make each path segment more specific if other siblings of the same type exist
       let index = findNthChildIndex(element)
       return element.localName + (index !== -1 ? ':nth-child(' + index + ')' : '')
-    }).join('>')//join all the segments for the query selector
+    }).join('>')// join all the segments for the query selector
     console.log(fullPath)
     return fullPath
   }
 }
 
-function isAnyElementInPathClassOrChildOfClass(path: HTMLElement[], className) {
-  for (var i = 0; i < path.length; i++) {
+function isAnyElementInPathClassOrChildOfClass (path: HTMLElement[], className) {
+  for (let i = 0; i < path.length; i++) {
     if (Array.from(path[i].classList).indexOf(className) !== -1) {
       return true
     }
@@ -278,10 +271,10 @@ function isAnyElementInPathClassOrChildOfClass(path: HTMLElement[], className) {
   return false
 }
 
-function getPathUpTillBody(path) {
-  //get index of body, ignore window , document shadow etc
+function getPathUpTillBody (path) {
+  // `get index of body, ignore window , document shadow etc
   let length = path.length
-  for (var i = 0; i < length; i++) {
+  for (let i = 0; i < length; i++) {
     if (path[i].tagName === 'BODY') {
       return path.slice(0, i + 1).reverse()
     }
