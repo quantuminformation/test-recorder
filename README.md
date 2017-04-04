@@ -1,10 +1,20 @@
 # Donations
-If you feel this project would be useful you are most welcome to buy me a coffee! https://ko-fi.com/A325GAE
+If this project is useful to you and you would like to support it, you are most welcome to buy me a coffee! https://ko-fi.com/A325GAE
+
+# Using the test-recorder to record tests for your apps
+
+Import the script and init the TestRecorder. Thats it! 
+
+`<script src="node_modules/test-recorder/test-recorder.js"></script>
+
+<script type="text/javascript">
+  var testRecorder = new TestRecorder.TestRecorder()
+</script>
+`
 
 # Browser compatibility
 
-As this is a pure dev tool, I only support Chrome due to it having the features I need. Other browsers can be supported if 
-it becomes too big a pain point.
+As this is a pure dev tool, I only support recording your Applications on Chrome due to it having the features I need. Other browsers can be supported if I get enough support
 
 # test-recorder
 This is an ambitious project that aims to record integration tests for any web application. It also provides assertions to changes in your DOM structure.
@@ -36,30 +46,27 @@ andThen(function () {
 If you don't want an element to be recorded, and any of its children add this class to it `doNotRecord`
 
 
+# Generating tests in the text example app
 
-## Nightwatch tests
 
-I have an example app inside /tests. First you need to build the test project by running `npm i` and `webpack` inside /tests, then you 
-can open tests/build/ in the browser to see the app running with the test recorder UI. This has some basic UI that as you
-interact with, will generate output integration tests.
+I have an example app inside /tests that can be used to generate tests for the various test frameworks.
+ 
+* First you need to build the test project by running `npm i` and `webpack` inside `/tests`. 
+* then you can open `tests/build/` in the browser to see the app running with the test recorder UI. 
+* You can select what framework you are using and you can copy the code that is generated.
+* Once you have the tests generated you can paste the code into the actual test file inside the relevant test framework, e.g `tests/nightwatch/tests/index.test.js
 
-Once you have the tests generated you can paste the code into the actual test file: I've made a sample one called index.test.js
+Note all the tests frameworks have a test example file for you to get started.
 
-This uses the basicConf.js to run a single file ('test-recorder-spec.js'), you can paste the generated test code into there
+# Playing back the tests
+Each of the following examples assumes you are running `node tests/server.js`
 
-You need to start webdriver:
-`npm run webdriver`
+## Running nightwatch tests
 
-then run protractor with :
-`npm run vanilla-test`
+This uses `tests/nightwatch/nightwatch.json` as settings to to run test files in the  `tests/nightwatch/tests` folder.
 
-# Using the test-recorder in your apps
+* run nightwatch inside of `test/nightwatch`
 
-`<script src="node_modules/test-recorder/test-recorder.js"></script>
-<script type="text/javascript">
-  var testRecorder = new TestRecorder.TestRecorder()
-</script>
-`
 
 # Ember (WIP)
 
