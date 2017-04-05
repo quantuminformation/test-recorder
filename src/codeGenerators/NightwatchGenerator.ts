@@ -7,7 +7,7 @@ export class NightwatchGenerator implements ICodeGenerator {
   description: string = 'NightWatch generator'
 
   constructor () {
-
+  // tslint:disable-line
   }
 
   /*  initialCode(): string {
@@ -23,9 +23,9 @@ export class NightwatchGenerator implements ICodeGenerator {
 
   clickHappened (queryPath: string) {
     let code = `
-${formattingRules.indentationX2}.click('${queryPath}')
-${formattingRules.indentationX2}.pause(500)
-${formattingRules.indentationX2}${TestRecorder.MUTATIONS_PLACEHOLDER}`
+browser.click('${queryPath}')
+browser.pause(500)
+${TestRecorder.MUTATIONS_PLACEHOLDER}`
     return code
   }
 
@@ -36,8 +36,8 @@ ${formattingRules.indentationX2}${TestRecorder.MUTATIONS_PLACEHOLDER}`
   routeChanged () {
 
     if (this.lastRoute !== this.getCurrentRoute()) {
-      //x  this.lastRoute = this.getCurrentRoute()
-      let code = formattingRules.indentation + 'assert.equal(currentRouteName(), "' +
+      // x  this.lastRoute = this.getCurrentRoute()
+      let code = formattingRules.indentation + '.assert.equal(currentRouteName(), "' +
         this.getCurrentRoute() + '", "The page navigates to ' + this.getCurrentRoute() +
         ' on button click")<br/>'
       return code
@@ -52,11 +52,10 @@ ${formattingRules.indentationX2}${TestRecorder.MUTATIONS_PLACEHOLDER}`
   }
 
   elementAdded (id): string {
-    console.log('new el')
-    return `${formattingRules.indentation}assert.visible('${id}')<br/>`
+    return `browser.expect.element('#${id}').to.be.present<br/>`
   }
 
   elementRemoved (id): string {
-    return formattingRules.indentation + "expect($('#" + id + "').isDisplayed()).toBe(false) '<br/>'"
+    return `browser.expect.element('#${id}').to.not.be.present<br/>`
   }
 }

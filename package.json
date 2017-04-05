@@ -7,7 +7,7 @@
   ],
   "main": "build/test-recorder.js",
   "scripts": {
-    "test": "test",
+    "test": "npm run lint",
     "webdriver": "webdriver-manager start --standalone",
     "lint": "tslint src/**/*.ts"
   },
@@ -38,6 +38,7 @@
     "postcss-import": "^9.1.0",
     "postcss-loader": "^1.2.2",
     "postcss-nested": "^1.0.0",
+    "pre-commit": "^1.2.2",
     "prismjs": "^1.6.0",
     "style-loader": "^0.15.0",
     "tslint": "^5.0.0",
@@ -48,5 +49,7 @@
   },
   "dependencies": {
     "tslint-config-standard": "^4.0.0"
-  }
+  },
+  "pre-commit": "test"
+
 }

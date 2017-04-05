@@ -1,3 +1,5 @@
+<img src="https://codeship.com/projects/75fa7d90-fc5b-0134-0f39-32469d5c0e33/status?branch=master"/>
+
 # Donations
 If this project is useful to you and you would like to support it, you are most welcome to buy me a coffee! https://ko-fi.com/A325GAE
 

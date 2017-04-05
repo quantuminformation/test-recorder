@@ -1,6 +1,4 @@
 {
-  "name": "typescriptImport",
-  "main": "index.js",
   "devDependencies": {
     "awesome-typescript-loader": "^1.0.0",
     "babel-core": "^6.24.0",

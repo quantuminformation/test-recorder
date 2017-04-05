@@ -1,4 +1,4 @@
-import { TestRecorder } from '../src/TestRecorder'
+import { TestRecorder } from '../../src/TestRecorder'
 import './index.pcss'
 
 let testRecorder = new TestRecorder()

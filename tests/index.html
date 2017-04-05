@@ -9,11 +9,43 @@
 
 <table>
   <td>
-    <button>No side effect</button>
+
+    <table id="interactions">
+      <th>Interactive element</th>
+      <th>Event that generates code</th>
+      <tr>
+        <td>
+          <button>No side effect</button>
+        </td>
+        <td>onclick</td>
+      </tr>
+      <tr>
+        <td>
+          <button id="makeDiv">Creates a div</button>
+        </td>
+        <td>onclick</td>
+      </tr>
+      <tr>
+        <td><input type="text"></input>
+        </td>
+        <td>focusout</td>
+      </tr>
+      <tr>
+        <td><select name="" id="">
+          <option value="">Option 1</option>
+          <option value="">Option 2</option>
+          <option value="">Option 3</option>
+        </select></td>
+        <td></td>
+      </tr>
+    </table>
+
+
     <br>
-    <button id="makeDiv">Creates a div</button>
     <br>
-    <input type="color">Change event should be generated</input>
+    <!--
+        <input type="color">onchange</input>
+    -->
   </td>
   <td id="sandbox"></td>
 </table>

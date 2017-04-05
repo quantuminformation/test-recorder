@@ -1,11 +1,11 @@
 //todo perhaps use typescript to have these as interface implementation
 import mutationUtils from './util/MutationUtils'
-import {NightwatchGenerator} from './codeGenerators/NightwatchGenerator'
+import { NightwatchGenerator } from './codeGenerators/NightwatchGenerator'
 import './styles/app.pcss'
-import {copyTextToClipboard} from './util/clipboard'
+import { copyTextToClipboard } from './util/clipboard'
 import  'prismjs'
 import  'prismjs/components/prism-javascript'
-import {ICodeGenerator} from './codeGenerators/ICodeGenerator'
+import { ICodeGenerator } from './codeGenerators/ICodeGenerator'
 declare var Prism
 
 /**
@@ -24,13 +24,19 @@ export class TestRecorder {
 
   static MUTATIONS_PLACEHOLDER = '[MUTATIONS_PLACEHOLDER]'
   static DO_NOT_RECORD = 'doNotRecord'
+  static FRAMEWORK_OPTIONS = ['NIGHTWATCH', 'EMBER-CLI']
 
   constructor () {
     let rootDomNode = document.querySelector('body')
     let ui = document.createElement('div')
     ui.innerHTML =
       `<div id="testRecorderUI" class="doNotRecord">
-    <div id="testRecorderUI-Title">${this.currentCodeGenerator.description} <button id="copy">Copy</button></div> 
+      <div id="testRecorderUI-Title">${this.currentCodeGenerator.description} 
+      <button id="copy">Copy</button>
+      <select id="framework-choice">
+        ${TestRecorder.FRAMEWORK_OPTIONS.map(item => '<option value="item">' + item + '</option>').join('')}
+      </select>
+    </div> 
     <div id="generatedScript" class="language-javascript"></div> 
     </div>`
 
@@ -38,33 +44,44 @@ export class TestRecorder {
 
     let codeOutputDiv = document.getElementById('generatedScript')
     this.hostElement = codeOutputDiv
-    this.setUpChangeListeners()
-    this.setUpOtherListeners()
     //this will iterate through this node and watch for changes and store them until we want to display them
     this.addObserverForTarget(rootDomNode, 0)
     // this.setGeneratedScript(this.currentCodeGenerator.initialCode())
     this.addListeners()
   }
 
+  /**
+   * listen to events of various type bubbling up to the document
+   */
   addListeners () {
 
     //test recorder UI--------------------------------------------------------------------
     document.querySelector('#copy').addEventListener('click', () => {
       copyTextToClipboard(this.hostElement.textContent)
-
     })
 
-    // on the users app being tests----------------------------------------------------------------
-    document.addEventListener('click', (e: any) => {
-
-      let path = getPathUpTillBody(e.path)
+    /**
+     * Common filter applied to all browser events
+     * @param e
+     * @returns {boolean}
+     */
+    function filterEvent (path: any): boolean {
+      path = getPathUpTillBody(path)
 
       if (!path || path.length === 0) { // eg clicking outside the body if the app is less than the height of the window
-        return
+        return false
       }
       if (isAnyElementInPathClassOrChildOfClass(path, TestRecorder.DO_NOT_RECORD)) {
+        return false
+      }
+      return true
+    }
+
+    document.addEventListener('click', (e: any) => {
+      if (!filterEvent(e.path)) {
         return
       }
+
       if (e.target.localName === 'input' && e.target.type === 'text' || //on listen to focus-out for these
         e.target.localName === 'html' ||  // don't want to record clicking outside the app'
         e.target.type === 'select-one') { // selects handled elsewhere
@@ -76,6 +93,29 @@ export class TestRecorder {
       this.awaitMutations()
     })
 
+    document.addEventListener('change', (e: any) => {
+      if (!filterEvent(e.path)) {
+        return
+      }
+
+      //setsUpSelect input watching
+      if (e.target.localName === 'select') {
+        let newSelectedIndex = e.target.selectedIndex
+        let newCode = this.currentCodeGenerator.selectChange(getPlaybackPath(e), newSelectedIndex)
+        this.appendToGeneratedScript(newCode)
+      }
+    })
+
+    document.addEventListener('focusout', (e: any) => {
+      if (!filterEvent(e.path)) {
+        return
+      }
+
+      if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
+        let newCode = this.currentCodeGenerator.inputTextEdited(getPlaybackPath(e), e.target.value)
+        this.appendToGeneratedScript(newCode)
+      }
+    })
   }
 
   insertMutationsToGeneratedScript () {
@@ -94,26 +134,6 @@ export class TestRecorder {
     //todo perhaps use Object.observe once FF supports it
     this.hostElement.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
     Prism.highlightAll()
-  }
-
-  setUpOtherListeners () {
-    document.addEventListener('focusout', (e: any) => {
-      if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
-        let newCode = this.currentCodeGenerator.inputTextEdited(getPlaybackPath(e), e.target.value)
-        this.appendToGeneratedScript(newCode)
-      }
-    })
-  }
-
-  setUpChangeListeners () {
-    document.addEventListener('change', (e: any) => {
-      //setsUpSelect input watching
-      if (e.target.localName === 'select') {
-        let newSelectedIndex = e.target.selectedIndex
-        let newCode = this.currentCodeGenerator.selectChange(getPlaybackPath(e), newSelectedIndex)
-        this.appendToGeneratedScript(newCode)
-      }
-    })
   }
 
   /*  window.addEventListener("hashchange", function (e) {
@@ -197,7 +217,7 @@ export class TestRecorder {
         this.cachedMutations += (addedNodesTestText || removedNodesTestText)
       })
     })
-    let config = {attributes: true, childList: true, characterData: true}
+    let config = { attributes: true, childList: true, characterData: true }
 
     // this is the only place where observe is called so we can track them here too to disconnect
     observer.observe(target, config)
@@ -246,16 +266,18 @@ function findNthChildIndex (element: HTMLElement) {
  *
  * @param e event from the DOM that we want to workout the testing path.
  */
-function getPlaybackPath (e: any) {
+function getPlaybackPath (e : any) {
   if (e.target.id) {
     return '#' + e.target.id
   } else {
-    let path = getPathUpTillBody(e.path)
+    let path = get_Path_To_Nearest_Class_or_Id(getPathUpTillBody(e.path)).reverse()
 
-    let fullPath = path.map(function (element) {
+    let fullPath = path.map(function (element: HTMLElement) {
       // we need to make each path segment more specific if other siblings of the same type exist
       let index = findNthChildIndex(element)
-      return element.localName + (index !== -1 ? ':nth-child(' + index + ')' : '')
+      let idPart = element.id ? `#${element.id}` : ""
+      let classPart = element.className ? `.${element.className}` : ""
+      return element.localName + idPart + classPart + (index !== -1 ? ':nth-child(' + index + ')' : '')
     }).join('>')// join all the segments for the query selector
     console.log(fullPath)
     return fullPath
@@ -276,7 +298,17 @@ function getPathUpTillBody (path) {
   let length = path.length
   for (let i = 0; i < length; i++) {
     if (path[i].tagName === 'BODY') {
-      return path.slice(0, i + 1).reverse()
+      return path.slice(0, i + 1)
+    }
+  }
+}
+
+function get_Path_To_Nearest_Class_or_Id (path) {
+  // `get index of body, ignore window , document shadow etc
+  let length = path.length
+  for (let i = 0; i < length; i++) {
+    if (path[i].className || path[i].id) {
+      return path.slice(0, i + 1)
     }
   }
 }

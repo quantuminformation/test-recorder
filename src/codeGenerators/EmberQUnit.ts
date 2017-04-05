@@ -7,6 +7,7 @@ export class NightwatchGenerator implements ICodeGenerator {
   description: string = 'Ember QUnit generator'
 
   constructor () {
+  // tslint:disable-line
 
   }
 
