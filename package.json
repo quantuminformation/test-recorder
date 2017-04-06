@@ -29,7 +29,7 @@
     "autoprefixer": "^6.5.4",
     "awesome-typescript-loader": "^3.0.0-beta.18",
     "babel-core": "^6.24.0",
-    "css-loader": "^0.27.3",
+    "css-loader": "^0.28.0",
     "css-variables": "^0.1.0",
     "html-webpack-plugin": "^2.24.1",
     "postcss-calc": "^5.3.1",
@@ -40,15 +40,15 @@
     "postcss-nested": "^1.0.0",
     "pre-commit": "^1.2.2",
     "prismjs": "^1.6.0",
-    "style-loader": "^0.15.0",
+    "style-loader": "^0.16.1",
     "tslint": "^5.0.0",
     "typescript": "^2.1.4",
     "vanilla-typescript": "^0.3.1",
-    "webpack": "2.3.0",
+    "webpack": "2.3.3",
     "webpack-build-notifier": "^0.1.13"
   },
   "dependencies": {
-    "tslint-config-standard": "^4.0.0"
+    "tslint-config-standard": "^5.0.2"
   },
   "pre-commit": "test"
 

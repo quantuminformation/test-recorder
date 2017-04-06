@@ -31,14 +31,14 @@ export class TestRecorder {
     let ui = document.createElement('div')
     ui.innerHTML =
       `<div id="testRecorderUI" class="doNotRecord">
-      <div id="testRecorderUI-Title">${this.currentCodeGenerator.description} 
-      <button id="copy">Copy</button>
-      <select id="framework-choice">
-        ${TestRecorder.FRAMEWORK_OPTIONS.map(item => '<option value="item">' + item + '</option>').join('')}
-      </select>
-    </div> 
-    <div id="generatedScript" class="language-javascript"></div> 
-    </div>`
+        <button id="copy">Copy</button>
+        <select id="framework-choice">
+          ${TestRecorder.FRAMEWORK_OPTIONS.map(item => '<option value="item">' + item + '</option>').join('')}
+        </select>
+    
+        <div id="generatedScript" class="language-javascript"></div> 
+        </div>
+    </div> `
 
     document.body.appendChild(ui.firstChild)
 
@@ -100,8 +100,7 @@ export class TestRecorder {
 
       //setsUpSelect input watching
       if (e.target.localName === 'select') {
-        let newSelectedIndex = e.target.selectedIndex
-        let newCode = this.currentCodeGenerator.selectChange(getPlaybackPath(e), newSelectedIndex)
+        let newCode = this.currentCodeGenerator.selectChange(getPlaybackPath(e), e)
         this.appendToGeneratedScript(newCode)
       }
     })
@@ -217,7 +216,7 @@ export class TestRecorder {
         this.cachedMutations += (addedNodesTestText || removedNodesTestText)
       })
     })
-    let config = { attributes: true, childList: true, characterData: true }
+    let config = { attributes: true, childList: true, characterData: true,subTree:true }
 
     // this is the only place where observe is called so we can track them here too to disconnect
     observer.observe(target, config)
@@ -311,4 +310,5 @@ function get_Path_To_Nearest_Class_or_Id (path) {
       return path.slice(0, i + 1)
     }
   }
+  return path
 }

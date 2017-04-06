@@ -9,4 +9,7 @@ this.demoTest = function (browser) {
   browser.pause(500)
   browser.expect.element('#new-element').to.be.present
 */
+
+
+  browser.end();
 };

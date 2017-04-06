@@ -7,18 +7,18 @@ export class NightwatchGenerator implements ICodeGenerator {
   description: string = 'NightWatch generator'
 
   constructor () {
-  // tslint:disable-line
+    // tslint:disable-line
   }
 
-  /*  initialCode(): string {
-   return `
-   'Demo test Google' : function (client) {
-   ${formattingRules.indentation}client`
-
-   }*/
-
-  selectChange (queryPath, newSelectedIndex) {
-    return 'select triggered' + queryPath + newSelectedIndex
+  selectChange (queryPath, event: Event) {
+    let target = event.target as HTMLSelectElement
+    let newSelectedIndex = target.selectedIndex
+    let newValue = (target.options[newSelectedIndex] as HTMLOptionElement).value
+    let code = `
+browser.click('${queryPath} [value="${newValue}"]')
+browser.pause(500)
+${TestRecorder.MUTATIONS_PLACEHOLDER}`
+    return code
   }
 
   clickHappened (queryPath: string) {

@@ -4,5 +4,5 @@ export interface ICodeGenerator {
   elementRemoved: (id: string) => string
   clickHappened: (queryPath: string) => string
   inputTextEdited: (queryPath: string, newValue: string) => string
-  selectChange: (queryPath: string, newSelectedIndex: number) => string
+  selectChange: (queryPath: string, event: Event) => string
 }
