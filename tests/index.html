@@ -10,9 +10,9 @@
 
 
     <table id="interactions">
-      <th>Interactive element</th>
+      <th id="interactiveElements">Interactive elements</th>
       <th>Event that generates code</th>
-      <th style="width: 200px">Mutation (if any)</th>
+      <th id="mutationColumn">Mutation (if any)</th>
       <tr>
         <td>
           <button>No side effect</button>
@@ -23,6 +23,7 @@
       <tr>
         <td>
           <button id="makeDiv">Creates a div</button>
+          <button id="removeDiv">Removes the div</button>
         </td>
         <td>onclick</td>
         <td id="buttonClickMutation"></td>

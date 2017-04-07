@@ -71,5 +71,8 @@ ${formattingRules.indentationX2}})`
   elementRemoved (id) {
     return formattingRules.indentation + 'assert.equal(find("#' + id + '").length, 0, "' + id + ' removed AFTER user [INSERT REASON]")' + '<br/>'
   }
-
+  characterDataChanged (record: MutationRecord) {
+    let el = record.target as HTMLElement
+    return `browser.assert.containsText('#${el.id}',${el.nodeValue})<br/>`
+  }
 }

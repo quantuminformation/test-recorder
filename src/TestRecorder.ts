@@ -102,6 +102,8 @@ export class TestRecorder {
       if (e.target.localName === 'select') {
         let newCode = this.currentCodeGenerator.selectChange(getPlaybackPath(e), e)
         this.appendToGeneratedScript(newCode)
+        this.awaitMutations()
+
       }
     })
 
@@ -113,6 +115,7 @@ export class TestRecorder {
       if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
         let newCode = this.currentCodeGenerator.inputTextEdited(getPlaybackPath(e), e.target.value)
         this.appendToGeneratedScript(newCode)
+        this.awaitMutations()
       }
     })
   }
@@ -165,6 +168,41 @@ export class TestRecorder {
     }.bind(this), 500)
   }
 
+  childListMutation (mutationRecord: MutationRecord) {
+    let addedNodesTestText = ''
+    let removedNodesTestText = ''
+
+    //convert these to Arrays
+    let addedNodesArray = Array.prototype.slice.call(mutationRecord.addedNodes)
+    let removedNodesArray = Array.prototype.slice.call(mutationRecord.removedNodes)
+
+    // this array is used to generate the source code, we filter
+    addedNodesArray = addedNodesArray.filter(mutationUtils.filter_DoNotRecord_WhiteSpace_emberID_noID)
+    removedNodesArray = removedNodesArray.filter(mutationUtils.filter_DoNotRecord_WhiteSpace_emberID_noID)
+
+    if (!addedNodesArray.length && !removedNodesArray.length) {
+      //no point continuing in this iteration if nothing of interest
+      return
+    }
+
+    // mutations should be mutually exclusive?
+    if (addedNodesArray.length && removedNodesArray.length) {
+      alert('strange')
+      return
+    }
+
+    addedNodesArray.forEach((node) => {
+      addedNodesTestText += this.currentCodeGenerator.elementAdded(node.id)
+    })
+
+    removedNodesArray.forEach((node) => {
+      removedNodesTestText += this.currentCodeGenerator.elementRemoved(node.id)
+    })
+
+    // this sends this new changes back
+    this.cachedMutations += (addedNodesTestText || removedNodesTestText)
+  }
+
   /**
    * Adds observer for target and generates source code
    * then adds observers for its children recursively
@@ -172,70 +210,35 @@ export class TestRecorder {
    */
   addObserverForTarget (target, recursionDepth) {
     let observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+      mutations.forEach((mutationRecord: MutationRecord) => {
 
-        let addedNodesTestText = ''
-        let removedNodesTestText = ''
+        switch (mutationRecord.type) {
+          case 'characterData':
+            let target = mutationRecord.target as HTMLElement
 
-        //convert these to Arrays
-        let addedNodesArray = Array.prototype.slice.call(mutation.addedNodes)
-        let removedNodesArray = Array.prototype.slice.call(mutation.removedNodes)
-
-        // This array is used to add new mutation Observers from the newly added DOM
-        let newMutationsFromAddedNodesArray = addedNodesArray.filter(mutationUtils.filterDoNotRecordAndWhiteSpace)
-
-        // loop through the above and add observers, we need to do this dynamically
-        newMutationsFromAddedNodesArray.forEach((node) => {
-          this.addObserverForTarget(node, recursionDepth) // just drill down 2 levels more
-        })
-
-        // this array is used to generate the source code, we filter
-        addedNodesArray = addedNodesArray.filter(mutationUtils.filter_DoNotRecord_WhiteSpace_emberID_noID)
-        removedNodesArray = removedNodesArray.filter(mutationUtils.filter_DoNotRecord_WhiteSpace_emberID_noID)
-
-        if (!addedNodesArray.length && !removedNodesArray.length) {
-          //no point continuing in this iteration if nothing of interest
-          return
+            if (!target.parentElement.id ||
+              isElementClassOrChildOfClass(target, TestRecorder.DO_NOT_RECORD)) {
+              this.cachedMutations = ""
+              return
+            }
+            this.cachedMutations += this.currentCodeGenerator.characterDataChanged(mutationRecord)
+            return
+          case 'childList':
+            this.childListMutation(mutationRecord)
+            return
+          default:
+            console.log(`discarding mutation of type ${mutationRecord.type}`)
         }
 
-        // mutations should be mutually exclusive?
-        if (addedNodesArray.length && removedNodesArray.length) {
-          alert('strange')
-          return
-        }
-
-        addedNodesArray.forEach((node) => {
-          addedNodesTestText += this.currentCodeGenerator.elementAdded(node.id)
-        })
-
-        removedNodesArray.forEach((node) => {
-          removedNodesTestText += this.currentCodeGenerator.elementRemoved(node.id)
-        })
-
-        // this sends this new changes back
-        this.cachedMutations += (addedNodesTestText || removedNodesTestText)
       })
     })
-    let config = { attributes: true, childList: true, characterData: true,subTree:true }
+    let config = { attributes: true, childList: true, characterData: true, subtree: true }
 
     // this is the only place where observe is called so we can track them here too to disconnect
     observer.observe(target, config)
     console.log(target)
     this.mutationObserversArr.push(observer)
 
-    // Create observers for the children recursively
-    if ((target.children && target.children.length)) {
-      let nextRecursionDepth = recursionDepth + 1
-      for (let i = 0; target.children && i < target.children.length; i++) {
-        let child = target.children[i]
-        let classListArray = child.classList && Array.prototype.slice.call(child.classList)
-        let hasDoNotRecordClass = classListArray ? (classListArray.indexOf(TestRecorder.DO_NOT_RECORD) !== -1) : false
-
-        if (!hasDoNotRecordClass && recursionDepth <= 6) {
-          this.addObserverForTarget(child, nextRecursionDepth)
-        }
-      }
-    }
   }
 }
 
@@ -265,7 +268,7 @@ function findNthChildIndex (element: HTMLElement) {
  *
  * @param e event from the DOM that we want to workout the testing path.
  */
-function getPlaybackPath (e : any) {
+function getPlaybackPath (e: any) {
   if (e.target.id) {
     return '#' + e.target.id
   } else {
@@ -288,6 +291,18 @@ function isAnyElementInPathClassOrChildOfClass (path: HTMLElement[], className) 
     if (Array.from(path[i].classList).indexOf(className) !== -1) {
       return true
     }
+  }
+  return false
+}
+function isElementClassOrChildOfClass (element: HTMLElement, className): boolean {
+  let classListArray = element.classList && Array.prototype.slice.call(element.classList)
+  let hasDoNotRecordClass = classListArray ? (classListArray.indexOf('doNotRecord') !== -1) : false
+
+  if (hasDoNotRecordClass) {
+    return true
+  }
+  if (element.parentElement) {
+    return isElementClassOrChildOfClass(element.parentElement, className)
   }
   return false
 }

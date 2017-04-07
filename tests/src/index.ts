@@ -3,16 +3,18 @@ import './index.pcss'
 
 let testRecorder = new TestRecorder()
 
-//the vanilla interactions, but same would be
-
-let sandbox: HTMLElement = document.querySelector('#buttonClickMutation') as HTMLElement
 document.querySelector('#makeDiv').addEventListener('click', function () {
-
   let newElement: HTMLElement = document.createElement('div')
   newElement.innerHTML =
     `<p>Generated Div and P</p>`
   newElement.id = 'new-element'
-  sandbox.appendChild(newElement)
+  document.querySelector('#buttonClickMutation').appendChild(newElement)
+})
+document.querySelector('#removeDiv').addEventListener('click', function () {
+  let existingEl = document.querySelector('#new-element')
+  if (existingEl) {
+    document.querySelector('#buttonClickMutation').removeChild(document.querySelector('#new-element'))
+  }
 })
 
 document.querySelector('#select').addEventListener('change', function (event) {

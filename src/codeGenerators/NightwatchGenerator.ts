@@ -58,4 +58,10 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
   elementRemoved (id): string {
     return `browser.expect.element('#${id}').to.not.be.present<br/>`
   }
+
+  characterDataChanged (record: MutationRecord) {
+    let el = record.target as HTMLElement
+    return `browser.assert.containsText('#${el.parentElement.id}','${el.nodeValue}')<br/>`
+  }
+
 }
