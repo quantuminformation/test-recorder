@@ -17,6 +17,15 @@ document.querySelector('#removeDiv').addEventListener('click', function () {
   }
 })
 
+document.querySelector('#input').addEventListener('change', function () {
+  let mutationElement: HTMLElement = document.querySelector('#inputMutation') as HTMLElement
+  let target = event.target as HTMLSelectElement
+  mutationElement.innerText = target.value
+  // todo figure out a way to resolve mutation differences when using innerHTML
+  // see http://stackoverflow.com/a/43293314/3915717
+})
+
+
 document.querySelector('#select').addEventListener('change', function (event) {
 
   let mutationElement: HTMLElement = document.querySelector('#selectMutation') as HTMLElement

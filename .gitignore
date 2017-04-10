@@ -3,3 +3,4 @@ npm-debug.log
 testem.log
 /.idea
 /dist
+node_modules

@@ -7,12 +7,12 @@ If this project is useful to you and you would like to support it, you are most 
 
 Import the script and init the TestRecorder. Thats it! 
 
-`<script src="node_modules/test-recorder/test-recorder.js"></script>
+```<script src="node_modules/test-recorder/test-recorder.js"></script>
 
 <script type="text/javascript">
   var testRecorder = new TestRecorder.TestRecorder()
 </script>
-`
+```
 
 # Browser compatibility
 
@@ -70,14 +70,12 @@ This uses `tests/nightwatch/nightwatch.json` as settings to to run test files in
 * run nightwatch inside of `test/nightwatch`
 
 
-# Ember (WIP)
+# Running Ember-cli tests
 
-To use this, simply include this line of code someone in your ember-cli, I recommend in your `app.js`:
+I maintain a fork [here](https://github.com/QuantumInformation/ember-cli-todos) of the Ember-cli todos
 
-```js
-import main from 'ember-cli-test-recorder/main';// jshint ignore:line
-```
-Note: we use jshint ignore:line as we don't actually do anything with the main object, it sets everything up by itself
+I have an extra file where I can paste in the auto generated test:
+ 
 
 ## Roadmap
 * Record any changes to location (routes, html5 etc)

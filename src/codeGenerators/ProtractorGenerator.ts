@@ -30,11 +30,7 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
   }
 
   inputTextEdited (queryPath, newValue) {
-    let code = `
-browser.setValue('${queryPath}', '${newValue}')
-browser.pause(500)
-${TestRecorder.MUTATIONS_PLACEHOLDER}`
-    return code
+    return "$('" + queryPath + "').sendKeys('" + newValue + "')<br/>"
   }
 
   routeChanged () {
