@@ -16,7 +16,7 @@ module.exports = {
   },
   output: {
     path: PATHS.build,
-    filename: '[name].js',
+    filename: '[Description].js',
   },
   devtool: "source-map",
   module: {

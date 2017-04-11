@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<script src="../build/test-recorder.js">
+</script>
+<script >
+  new TestRecorder.TestRecorder()
+</script>
+
+
+<h1>Just to check the build works, no interactions cause mutations</h1>
+
+
+<table id="interactions">
+  <th id="interactiveElements">Interactive elements</th>
+  <th>Event that generates code</th>
+  <th id="mutationColumn">Mutation (if any)</th>
+  <tr>
+    <td>
+      <button>No side effect</button>
+    </td>
+    <td>onclick</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>
+      <button id="makeDiv">Creates a div</button>
+      <button id="removeDiv">Removes the div</button>
+    </td>
+    <td>onclick</td>
+    <td id="buttonClickMutation"></td>
+  </tr>
+  <tr>
+    <td><input type="text" id="input">
+    </td>
+    <td>focusout</td>
+    <td id="inputMutation">Initial Value input</td>
+  </tr>
+  <tr>
+    <td><select name="" id="select">
+      <option value="value1">Option 1</option>
+      <option value="value2">Option 2</option>
+      <option value="value3">Option 3</option>
+    </select></td>
+    <td>change</td>
+    <td id="selectMutation">Initial Value select</td>
+  </tr>
+</table>
+
+
+<br>
+<br>
+<!--
+    <input type="color">onchange</input>
+-->
+
+</div>
+</body>
+</html>

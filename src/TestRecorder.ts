@@ -6,6 +6,7 @@ import { copyTextToClipboard } from './util/clipboard'
 import  'prismjs'
 import  'prismjs/components/prism-javascript'
 import { ICodeGenerator } from './codeGenerators/ICodeGenerator'
+import { EmberCLIGenerator } from "./codeGenerators/EmberCLI";
 declare var Prism
 
 /**
@@ -13,8 +14,9 @@ declare var Prism
  */
 export class TestRecorder {
 
-  // defaults
-  currentCodeGenerator: ICodeGenerator = new NightwatchGenerator()
+  codeGenerators: Map<string, ICodeGenerator>
+
+  currentCodeGenerator: ICodeGenerator
 
   mutationObserversArr: MutationObserver[] = []
   generatedTestCode: string = '' //this is sent to what ever wants to receive generated code
@@ -24,16 +26,25 @@ export class TestRecorder {
 
   static MUTATIONS_PLACEHOLDER = '[MUTATIONS_PLACEHOLDER]'
   static DO_NOT_RECORD = 'doNotRecord'
-  static FRAMEWORK_OPTIONS = ['NIGHTWATCH', 'EMBER-CLI']
 
   constructor () {
+
+    let nightwatchGenerator = new NightwatchGenerator()
+    let emberCLIGenerator = new EmberCLIGenerator()
+    this.codeGenerators = new Map([
+      [emberCLIGenerator.description, emberCLIGenerator],
+      [nightwatchGenerator.description, nightwatchGenerator],
+    ])
+
+    this.currentCodeGenerator = this.codeGenerators.values().next().value
+
     let rootDomNode = document.querySelector('body')
     let ui = document.createElement('div')
     ui.innerHTML =
       `<div id="testRecorderUI" class="doNotRecord">
         <button id="copy">Copy</button>
         <select id="framework-choice">
-          ${TestRecorder.FRAMEWORK_OPTIONS.map(item => '<option value="item">' + item + '</option>').join('')}
+          ${Array.from(this.codeGenerators.keys()).map(item => `<option value="${item}">${item}</option>`).join('')}
         </select>
     
         <div id="generatedScript" class="language-javascript"></div> 
@@ -58,6 +69,10 @@ export class TestRecorder {
     //test recorder UI--------------------------------------------------------------------
     document.querySelector('#copy').addEventListener('click', () => {
       copyTextToClipboard(this.hostElement.textContent)
+    })
+    document.querySelector('#framework-choice').addEventListener('change', (event: any) => {
+      let newValue = (event.target.options[event.target.selectedIndex]).value
+      this.currentCodeGenerator = this.codeGenerators.get(newValue)
     })
 
     /**

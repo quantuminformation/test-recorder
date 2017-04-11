@@ -45,11 +45,8 @@
     "typescript": "^2.1.4",
     "vanilla-typescript": "^0.3.1",
     "webpack": "2.3.3",
-    "webpack-build-notifier": "^0.1.13"
-  },
-  "dependencies": {
+    "webpack-build-notifier": "^0.1.13",
     "tslint-config-standard": "^5.0.2"
   },
   "pre-commit": "test"
-
 }
