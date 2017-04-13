@@ -3,7 +3,7 @@ import './index.pcss'
 
 let testRecorder = new TestRecorder()
 
-document.querySelector('#makeDiv').addEventListener('click', function () {
+document.querySelector('.makeDiv').addEventListener('click', function () {
   let newElement: HTMLElement = document.createElement('div')
   newElement.innerHTML =
     `<p>Generated Div and P</p>`

@@ -56,11 +56,13 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
   }
 
   elementAdded (id): string {
-    return `browser.expect.element('#${id}').to.be.present<br/>`
+    return `browser.expect.element('#${id}').to.be.present<br/>
+`
   }
 
   elementRemoved (id): string {
-    return `browser.expect.element('#${id}').to.not.be.present<br/>`
+    return `browser.expect.element('#${id}').to.not.be.present<br/>
+`
   }
 
   characterDataChanged (record: MutationRecord) {

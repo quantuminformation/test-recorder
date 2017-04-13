@@ -7,6 +7,8 @@ import  'prismjs'
 import  'prismjs/components/prism-javascript'
 import { ICodeGenerator } from './codeGenerators/ICodeGenerator'
 import { EmberCLIGenerator } from "./codeGenerators/EmberCLI";
+declare var VERSION
+
 declare var Prism
 
 /**
@@ -42,11 +44,15 @@ export class TestRecorder {
     let ui = document.createElement('div')
     ui.innerHTML =
       `<div id="testRecorderUI" class="doNotRecord">
-        <button id="copy">Copy</button>
-        <select id="framework-choice">
-          ${Array.from(this.codeGenerators.keys()).map(item => `<option value="${item}">${item}</option>`).join('')}
-        </select>
-    
+        <div class="header">
+          <span id="clear" >&#x1F6AB;</span>
+          <span id="debug">&#x1F41B;</span>
+          <button id="copy">Copy</button>
+          <select id="framework-choice">
+            ${Array.from(this.codeGenerators.keys()).map(item => `<option value="${item}">${item}</option>`).join('')}
+          </select>
+          <span class="info" >&#x1F3F7;</span>
+        </div>
         <div id="generatedScript" class="language-javascript"></div> 
         </div>
     </div> `
@@ -69,6 +75,17 @@ export class TestRecorder {
     //test recorder UI--------------------------------------------------------------------
     document.querySelector('#copy').addEventListener('click', () => {
       copyTextToClipboard(this.hostElement.textContent)
+    })
+    document.querySelector('.info').addEventListener('click', () => {
+   //   alert(`Version: ${VERSION}`)
+      alert(`Version: 0.13`)
+    })
+    document.querySelector('#debug').addEventListener('click', () => {
+      console.log(this.cachedMutations)
+      console.log(this)
+    })
+    document.querySelector('#clear').addEventListener('click', () => {
+      this.setGeneratedScript("")
     })
     document.querySelector('#framework-choice').addEventListener('change', (event: any) => {
       let newValue = (event.target.options[event.target.selectedIndex]).value
@@ -293,7 +310,8 @@ function getPlaybackPath (e: any) {
       // we need to make each path segment more specific if other siblings of the same type exist
       let index = findNthChildIndex(element)
       let idPart = element.id ? `#${element.id}` : ""
-      let classPart = element.className ? `.${element.className}` : ""
+
+      let classPart = element.className ? `.${Array.from(element.classList).map(className => className).join('.')}` : ""
       return element.localName + idPart + classPart + (index !== -1 ? ':nth-child(' + index + ')' : '')
     }).join('>')// join all the segments for the query selector
     console.log(fullPath)

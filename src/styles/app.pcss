@@ -1,19 +1,42 @@
 
 #testRecorderUI {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 450px;
+  bottom: 10px;
+  left: 10px;
+  width: 250px;
   color: white;
+  border: 1px solid #0b97c4;
   height: 350px;
-  background-color: #272727;
-  overflow: scroll;
-  font-size: 9px;
+  background-color: rgba(11, 11, 11, 0.6);
+
+  font-size: 8px;
   resize: both;
+  z-index: 1000;
+  resize: both;
+  overflow: auto;
+
+  pointer-events: none;
+
+  .header {
+    background-color: #d4f7ff;
+    padding: 2px;
+    pointer-events: auto;
+  }
+
+  select {
+    width: 110px;
+    height: 18px;
+  }
+  button {
+    height: 18px;
+  }
+  #clear, #debug, .info {
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px;
+  }
+  .info {
+    float: right;
+  }
 }
 
-#testRecorderUI-Title {
-  height: 15px;
-  background-color: #0000FF;
-  color: #d5ffec;
-}

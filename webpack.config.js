@@ -1,5 +1,6 @@
 const path = require('path');
 const merge = require('webpack-merge');
+const webpack = require('webpack');
 var WebpackBuildNotifierPlugin = require("webpack-build-notifier");
 
 const parts = require('./webpack.parts');
@@ -27,7 +28,7 @@ const commonConfig = merge([
         {
           test: /\.ts$/,
           use: [{
-            loader: 'awesome-typescript-loader'
+            loader: 'ts-loader'
 
           }]
         },
@@ -59,6 +60,9 @@ const commonConfig = merge([
       new WebpackBuildNotifierPlugin({
         title: "My Project Webpack Build"
       }),
+      new webpack.DefinePlugin({
+        VERSION: JSON.stringify(require("./package.json").version),
+      })
     ]
   },
 ]);
