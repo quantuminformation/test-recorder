@@ -3,33 +3,26 @@
 # Donations
 If this project is useful to you and you would like to support it, you are most welcome to buy me a coffee! https://ko-fi.com/A325GAE
 
-# Using the test-recorder to record tests for your apps
-
-Import the script and init the TestRecorder. Thats it! 
-
-```<script src="node_modules/test-recorder/test-recorder.js"></script>
-
-<script type="text/javascript">
-  var testRecorder = new TestRecorder.TestRecorder()
-</script>
-```
-
-# Browser compatibility
-
-As this is a pure dev tool, I only support recording your Applications on Chrome due to it having the features I need. Other browsers can be supported if I get enough support
-
 # test-recorder
-This is an ambitious project that aims to record integration tests for any web application. It also provides assertions to changes in your DOM structure.
+The test-recorder is an ambitious project that aims to record integration tests for any web application. It also provides assertions to changes in your DOM structure.
 
-I am currently focused on getting the tests compatible with nightwish, Ember cli and soon: angular 4.
+I am currently focused on getting the tests compatible with nightwish, Ember CLI and soon: angular 4.
 
-This project records the ways you interact with your application, and then generates the code to playback these actions inside an acceptance test runner. 
+This project records the ways you interact with your application and then generates the code to playback these actions inside an acceptance test runner. 
 The idea is to save you time writing these tests by hand.
  
 You should only add the TestRecorder.js script to your app when your app behaves as
 expected (happy flow) as then you will have the tests generated for this. You can then take these tests and modify them to your specific needs.
 
-# Current UI interactions that are recorded for acceptance tests:
+# Browser compatibility
+
+As this is a pure dev tool, I only support recording your Applications on Chrome due to it having the features I need. I will support other browsers if I get enough support.
+
+
+# Installation
+`npm i --save-dev test-recorder`
+
+# Current UI interactions  recorded for acceptance tests:
 
 * Button clicks
 * Text input 
@@ -39,19 +32,19 @@ expected (happy flow) as then you will have the tests generated for this. You ca
 
 If an element doesn't have an id then an exlusive dom path selector will be generated to click on this button in a test, ie
 ```js
-click("html>body>div>div:eq(0)>button");
+click("body>div>div:eq(0)>button");
 andThen(function () {
  equal(find("#foo").length, 0, "foo removed AFTER user [INSERT REASON]");
 });
 ```
 
-If you don't want an element to be recorded, and any of its children add this class to it `doNotRecord`
+If you don't want to record an element, and any of its children add this class to it `doNotRecord`
 
 
 # Generating tests in the text example app
 
 
-I have an example app inside /tests that can be used to generate tests for the various test frameworks.
+I have an example app inside /tests that can be used to create tests for the various test frameworks.
  
 * First you need to build the test project by running `npm i` and `webpack` inside `/tests`. 
 * then you can open `tests/build/` in the browser to see the app running with the test recorder UI. 
@@ -63,6 +56,38 @@ Note all the tests frameworks have a test example file for you to get started.
 # Playing back the tests
 Each of the following examples assumes you are running `node tests/server.js`
 
+# Importing the test-recorder with no build system
+
+Import the script and init the TestRecorder. Thats it! 
+`
+
+```<script src="node_modules/test-recorder/test-recorder.js"></script>
+
+<script type="text/javascript">
+  var testRecorder = new TestRecorder.TestRecorder()
+</script>
+```
+
+# Importing the test-recorder with a build system like webpack or gulp
+
+Import the script and init the TestRecorder. That's it! 
+
+```js
+import { TestRecorder } from 'test-recorder'
+
+let testRecorder = new TestRecorder()
+```
+
+
+# Importing the test-recorder into an Ember-cli project
+
+Import the script and init the TestRecorder. Thats it! 
+
+* copy the test-recorder script to vendor. You can add an npm script for this `"copy": "cp node_modules/test-recorder/build/test-recorder.js vendor"`
+* import the test recorder to ember-cli-build.js:
+`  app.import('vendor/test-recorder.js');`
+* In your app run: `let testRecorder = new TestRecorder.TestRecorder()`
+
 ## Running nightwatch tests
 
 This uses `tests/nightwatch/nightwatch.json` as settings to to run test files in the  `tests/nightwatch/tests` folder.
@@ -72,20 +97,21 @@ This uses `tests/nightwatch/nightwatch.json` as settings to to run test files in
 
 # Running Ember-cli tests
 
-I maintain a fork [here](https://github.com/QuantumInformation/ember-cli-todos) of the Ember-cli todos
+Just paste in the output into the relevant place in your tests and run as normal. 
 
-I have an extra file where I can paste in the auto generated test:
+I maintain a fork [here](https://github.com/QuantumInformation/travis-web) of using the test-recorder with the travis-web app.
  
 
 ## Roadmap
-* Record any changes to location (routes, html5 etc)
+* Record any changes to location (routes, html5, etc)
 * Allow selects to be automated
 * Allow more complex click actions like the steps to click on inputs like select2 to be recorded
 * Ignore clicks on ember elements with no effect
 * Create codes for key-presses 
-* Get mutations to work with async effects more accurately with performance api
+* Get mutations to work with async effects to be configured with separate wait times
 * create tests for changes of lengths in lists
-* Generate cucumber specs
+* Create cucumber generator
+* Create protractor generator
 
 ## TIPS
 
@@ -93,4 +119,5 @@ Avoid making multiple button clicks (or other interactions that cause asynchrono
 finished updating. This will allow code generated by the mutations observer to be placed in the in the
 generated code. 
 
-
+## Limitations
+If you have a mutation that removes and element and adds it back, then two conflicting tests will be created. In future, we can ignore this.

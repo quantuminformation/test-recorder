@@ -8,19 +8,20 @@
   border: 1px solid #0b97c4;
   height: 350px;
   background-color: rgba(11, 11, 11, 0.6);
-
+  border-radius: 4px;
   font-size: 8px;
   resize: both;
   z-index: 1000;
   resize: both;
   overflow: auto;
 
-  pointer-events: none;
 
   .header {
-    background-color: #d4f7ff;
+    background-color: rgba(204, 250, 255, 0.9);
     padding: 2px;
     pointer-events: auto;
+    line-height: 18px;
+    text-align: center;
   }
 
   select {
@@ -37,6 +38,11 @@
   }
   .info {
     float: right;
+  }
+  #generatedScript {
+    padding: 4px;
+    pointer-events: none;
+
   }
 }
 

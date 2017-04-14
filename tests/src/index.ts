@@ -9,6 +9,15 @@ document.querySelector('.makeDiv').addEventListener('click', function () {
     `<p>Generated Div and P</p>`
   newElement.id = 'new-element'
   document.querySelector('#buttonClickMutation').appendChild(newElement)
+
+  let newElement2: HTMLElement = document.createElement('div')
+  newElement2.innerHTML =
+    `<p>Generated Div and P 2</p>`
+  newElement2.id = 'new-element2'
+  document.querySelector('#buttonClickMutation').appendChild(newElement2)
+  document.querySelector('#buttonClickMutation').removeChild(newElement2)
+
+
 })
 document.querySelector('#removeDiv').addEventListener('click', function () {
   let existingEl = document.querySelector('#new-element')
@@ -24,7 +33,6 @@ document.querySelector('#input').addEventListener('change', function () {
   // todo figure out a way to resolve mutation differences when using innerHTML
   // see http://stackoverflow.com/a/43293314/3915717
 })
-
 
 document.querySelector('#select').addEventListener('change', function (event) {
 

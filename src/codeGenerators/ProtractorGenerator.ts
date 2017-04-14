@@ -1,8 +1,9 @@
 import formattingRules from '../util/formattingRules'
 import { TestRecorder } from '../TestRecorder'
 import { ICodeGenerator } from './ICodeGenerator'
+import { MutationEntry } from '../util/MutationEntry'
 
-export class NightwatchGenerator implements ICodeGenerator {
+export class NightwatchGeneratork implements ICodeGenerator {
   lastRoute: string = ''
   description: string = 'NightWatch generator'
 
@@ -30,7 +31,11 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
   }
 
   inputTextEdited (queryPath, newValue) {
-    return "$('" + queryPath + "').sendKeys('" + newValue + "')<br/>"
+    let code = `
+browser.setValue('${queryPath}', '${newValue}')
+browser.pause(500)
+${TestRecorder.MUTATIONS_PLACEHOLDER}`
+    return code
   }
 
   routeChanged () {
@@ -51,17 +56,20 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
     return isIndex ? 'index' : pathArray[1]
   }
 
-  elementAdded (id): string {
-    return `browser.expect.element('#${id}').to.be.present<br/>`
+  elementAdded (id): MutationEntry {
+    return new MutationEntry(`#${id}`, `browser.expect.element('#${id}').to.be.present
+`)
   }
 
-  elementRemoved (id): string {
-    return `browser.expect.element('#${id}').to.not.be.present<br/>`
+  elementRemoved (id): MutationEntry {
+    return new MutationEntry(`#${id}`, `browser.expect.element('#${id}').to.not.be.present
+`)
   }
 
-  characterDataChanged (record: MutationRecord) {
+  characterDataChanged (record: MutationRecord): MutationEntry {
     let el = record.target as HTMLElement
-    return `browser.assert.containsText('#${el.parentElement.id}','${el.nodeValue}')<br/>`
+    return new MutationEntry(`#${el.parentElement.id}`, `browser.assert.containsText('#${el.parentElement.id}','${el.nodeValue}')
+`)
   }
 
 }

@@ -6,7 +6,8 @@ import { copyTextToClipboard } from './util/clipboard'
 import  'prismjs'
 import  'prismjs/components/prism-javascript'
 import { ICodeGenerator } from './codeGenerators/ICodeGenerator'
-import { EmberCLIGenerator } from "./codeGenerators/EmberCLI";
+import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator";
+import { MutationEntry } from "./util/MutationEntry";
 declare var VERSION
 
 declare var Prism
@@ -23,7 +24,7 @@ export class TestRecorder {
   mutationObserversArr: MutationObserver[] = []
   generatedTestCode: string = '' //this is sent to what ever wants to receive generated code
   lastRoute: ''
-  cachedMutations: string = '' //this stores the changes made from mutations until we want to insert them into the generated code
+  cachedMutations: MutationEntry[] = [] //this stores the changes made from mutations until we want to insert them into the generated code
   hostElement: HTMLElement
 
   static MUTATIONS_PLACEHOLDER = '[MUTATIONS_PLACEHOLDER]'
@@ -77,7 +78,7 @@ export class TestRecorder {
       copyTextToClipboard(this.hostElement.textContent)
     })
     document.querySelector('.info').addEventListener('click', () => {
-   //   alert(`Version: ${VERSION}`)
+      //   alert(`Version: ${VERSION}`)
       alert(`Version: 0.13`)
     })
     document.querySelector('#debug').addEventListener('click', () => {
@@ -153,9 +154,22 @@ export class TestRecorder {
   }
 
   insertMutationsToGeneratedScript () {
-    this.setGeneratedScript(this.generatedTestCode.replace(TestRecorder.MUTATIONS_PLACEHOLDER, this.cachedMutations))
-    this.cachedMutations = ''
+
+    // removeConflictingMutations by retrieving last values of a given path
+    var lastUniqueItems = {};
+    this.cachedMutations.forEach(item => {
+      lastUniqueItems[item.path] = item
+    })
+
+    this.cachedMutations = (Object as any).values(lastUniqueItems)
+
+    let final =  this.cachedMutations.map((item:MutationEntry)=>item.generatedCode).join("<br>")
+    this.setGeneratedScript(this.generatedTestCode.replace(TestRecorder.MUTATIONS_PLACEHOLDER,final))
+    this.cachedMutations = []
   }
+
+
+
 
   setGeneratedScript (code) {
     this.generatedTestCode = code
@@ -201,8 +215,8 @@ export class TestRecorder {
   }
 
   childListMutation (mutationRecord: MutationRecord) {
-    let addedNodesTestText = ''
-    let removedNodesTestText = ''
+    let addedNodesMutationEntries: MutationEntry[] = []
+    let removedNodesMutationEntries: MutationEntry[] = []
 
     //convert these to Arrays
     let addedNodesArray = Array.prototype.slice.call(mutationRecord.addedNodes)
@@ -224,22 +238,17 @@ export class TestRecorder {
     }
 
     addedNodesArray.forEach((node) => {
-      addedNodesTestText += this.currentCodeGenerator.elementAdded(node.id)
+      addedNodesMutationEntries.push( this.currentCodeGenerator.elementAdded(node.id))
     })
 
     removedNodesArray.forEach((node) => {
-      removedNodesTestText += this.currentCodeGenerator.elementRemoved(node.id)
+      removedNodesMutationEntries.push( this.currentCodeGenerator.elementRemoved(node.id))
     })
 
     // this sends this new changes back
-    this.cachedMutations += (addedNodesTestText || removedNodesTestText)
+    this.cachedMutations = this.cachedMutations.concat(addedNodesMutationEntries.length? addedNodesMutationEntries : removedNodesMutationEntries)
   }
 
-  /**
-   * Adds observer for target and generates source code
-   * then adds observers for its children recursively
-   * @param target
-   */
   addObserverForTarget (target, recursionDepth) {
     let observer = new MutationObserver((mutations) => {
       mutations.forEach((mutationRecord: MutationRecord) => {
@@ -250,10 +259,9 @@ export class TestRecorder {
 
             if (!target.parentElement.id ||
               isElementClassOrChildOfClass(target, TestRecorder.DO_NOT_RECORD)) {
-              this.cachedMutations = ""
               return
             }
-            this.cachedMutations += this.currentCodeGenerator.characterDataChanged(mutationRecord)
+            this.cachedMutations.push(this.currentCodeGenerator.characterDataChanged(mutationRecord))
             return
           case 'childList':
             this.childListMutation(mutationRecord)
@@ -360,3 +368,4 @@ function get_Path_To_Nearest_Class_or_Id (path) {
   }
   return path
 }
+

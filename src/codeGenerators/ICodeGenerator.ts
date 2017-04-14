@@ -1,10 +1,11 @@
+import { MutationEntry } from '../util/MutationEntry'
 export interface ICodeGenerator {
   description: string
 
   // mutations
-  elementAdded: (id: string) => string
-  elementRemoved: (id: string) => string
-  characterDataChanged: (record: MutationRecord) => string
+  elementAdded: (id: string) => MutationEntry
+  elementRemoved: (id: string) => MutationEntry
+  characterDataChanged: (record: MutationRecord) => MutationEntry
 
   // events
   clickHappened: (queryPath: string) => string

@@ -1,6 +1,6 @@
 {
   "name": "test-recorder",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "to record integration tests for different frameworks.",
   "files": [
     "build/test-recorder.js"

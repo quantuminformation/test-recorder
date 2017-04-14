@@ -1,6 +1,7 @@
 import formattingRules from '../util/formattingRules'
 import { TestRecorder } from '../TestRecorder'
 import { ICodeGenerator } from './ICodeGenerator'
+import { MutationEntry } from '../util/MutationEntry'
 
 export class EmberCLIGenerator implements ICodeGenerator {
   lastRoute: string = ''
@@ -17,7 +18,8 @@ export class EmberCLIGenerator implements ICodeGenerator {
     let code = `
 Ember.$('${queryPath}').trigger({type:'mouseup', which:1});
 andThen(function () {
-${formattingRules.indentationX2}${TestRecorder.MUTATIONS_PLACEHOLDER}});`
+${TestRecorder.MUTATIONS_PLACEHOLDER}
+});`
     return code
   }
 
@@ -25,7 +27,8 @@ ${formattingRules.indentationX2}${TestRecorder.MUTATIONS_PLACEHOLDER}});`
     let code = `
 click('${queryPath}');
 andThen(function () {
-${formattingRules.indentationX2}${TestRecorder.MUTATIONS_PLACEHOLDER}});`
+${TestRecorder.MUTATIONS_PLACEHOLDER}
+});`
     return code
   }
 
@@ -33,24 +36,22 @@ ${formattingRules.indentationX2}${TestRecorder.MUTATIONS_PLACEHOLDER}});`
     let code = `
 fillIn('${queryPath}', '${newValue}')
 andThen(function () {
-${formattingRules.indentationX2}${TestRecorder.MUTATIONS_PLACEHOLDER}});`
+${TestRecorder.MUTATIONS_PLACEHOLDER}
+});`
     return code
   }
 
   elementAdded (id) {
-    return `assert.equal(find('#${id}').length, 1, '${id} shown AFTER user [INSERT REASON]');
-    `
+    return new MutationEntry(`#${id}`, `${formattingRules.indentationX2}assert.equal(find('#${id}').length, 1, '${id} shown AFTER user [INSERT REASON]');`)
   }
 
   elementRemoved (id) {
-    return `assert.equal(find('#${id}').length, 0, '${id} removed AFTER user [INSERT REASON]');
-    `
+    return new MutationEntry(`#${id}`, `${formattingRules.indentationX2}assert.equal(find('#${id}').length, 0, '${id} removed AFTER user [INSERT REASON]');`)
   }
 
   characterDataChanged (record: MutationRecord) {
     let el = record.target as HTMLElement
-    return `equal(find('#${el.parentElement.id}').text(), '${el.nodeValue}')
-    `
+    return new MutationEntry(`#${el.parentElement.id}`, `${formattingRules.indentationX2}equal(find('#${el.parentElement.id}').text(), '${el.nodeValue}')`)
   }
 
 }
