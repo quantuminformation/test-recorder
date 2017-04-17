@@ -1,48 +1,49 @@
 
 #testRecorderUI {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  width: 250px;
-  color: white;
-  border: 1px solid #0b97c4;
-  height: 350px;
-  background-color: rgba(11, 11, 11, 0.6);
-  border-radius: 4px;
-  font-size: 8px;
-  resize: both;
-  z-index: 1000;
-  resize: both;
-  overflow: auto;
-
+  position: absolute !important;
+  bottom: 10px !important;
+  left: 10px !important;
+  width: 250px ;
+  color: white !important;
+  border: 1px solid #0b97c4 !important;
+  height: 350px ;
+  background-color: rgba(11, 11, 11, 0.6) !important;
+  border-radius: 4px !important;
+  font-size: 8px !important;
+  resize: both !important;
+  z-index: 1000 !important;
+  resize: both !important;
+  overflow: auto !important;
 
   .header {
-    background-color: rgba(204, 250, 255, 0.9);
-    padding: 2px;
-    pointer-events: auto;
-    line-height: 18px;
-    text-align: center;
+    background-color: rgba(204, 250, 255, 0.9) !important;
+    padding: 2px !important;
+    line-height: 18px !important;
+    text-align: center !important;
+    position: fixed !important;
   }
 
-  select {
-    width: 110px;
-    height: 18px;
-  }
-  button {
-    height: 18px;
+  select, button {
+    padding: 3px !important;
+    margin: 1px !important;
   }
   #clear, #debug, .info {
-    cursor: pointer;
-    font-size: 13px;
-    padding: 2px;
+    cursor: pointer !important;
+    font-size: 13px !important;
+    padding: 2px !important;
   }
   .info {
-    float: right;
+    float: right !important;
   }
   #generatedScript {
-    padding: 4px;
-    pointer-events: none;
+    padding: 4px !important;
+    margin-top: 15px !important;
 
+    pre {
+      background-color: initial !important;
+      font-size: inherit !important;
+      overflow: visible !important;
+    }
   }
 }
 

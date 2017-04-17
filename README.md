@@ -22,7 +22,7 @@ As this is a pure dev tool, I only support recording your Applications on Chrome
 # Installation
 `npm i --save-dev test-recorder`
 
-# videos
+# Videos
 
 To help you understand how it works I made a [video playlist](https://www.youtube.com/playlist?list=PLCrwuqjmVebKF6cpH-hcLpSXYhSNiO7g7)!
 
