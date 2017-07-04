@@ -1,4 +1,5 @@
 import { MutationEntry } from '../util/MutationEntry'
+import { UserEvent } from '../util/UserEvent'
 export interface ICodeGenerator {
   description: string
 
@@ -8,7 +9,7 @@ export interface ICodeGenerator {
   characterDataChanged: (record: MutationRecord) => MutationEntry
 
   // events
-  clickHappened: (queryPath: string) => string
-  inputTextEdited: (queryPath: string, newValue: string) => string
-  selectChange: (queryPath: string, event: Event) => string
+  clickHappened: (queryPath: string) => UserEvent
+  inputTextEdited: (queryPath: string, newValue: string) => UserEvent
+  selectChange: (queryPath: string, event: Event) => UserEvent
 }

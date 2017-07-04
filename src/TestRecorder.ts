@@ -3,14 +3,16 @@ import mutationUtils from './util/MutationUtils'
 import { NightwatchGenerator } from './codeGenerators/NightwatchGenerator'
 import './styles/app.pcss'
 import { copyTextToClipboard } from './util/clipboard'
-import  'prismjs'
-import  'prismjs/components/prism-javascript'
+//import  'prismjs'
+//import  'prismjs/components/prism-javascript'
 import { ICodeGenerator } from './codeGenerators/ICodeGenerator'
 import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator";
 import { MutationEntry } from "./util/MutationEntry";
+import { Config } from "./Config";
+import { UserEvent } from "./util/UserEvent";
 declare var VERSION
 
-declare var Prism
+//declare var Prism
 
 /**
  * Default tests that are generated are for Nightwatch
@@ -20,9 +22,14 @@ export class TestRecorder {
   codeGenerators: Map<string, ICodeGenerator>
 
   currentCodeGenerator: ICodeGenerator
+  currentUserEvent: UserEvent
 
   mutationObserversArr: MutationObserver[] = []
   generatedTestCode: string = '' //this is sent to what ever wants to receive generated code
+
+  //todo think about refactor
+  //userEvents: UserEvent[] = []
+
   lastRoute: ''
   cachedMutations: MutationEntry[] = [] //this stores the changes made from mutations until we want to insert them into the generated code
   hostElement: HTMLElement
@@ -30,7 +37,10 @@ export class TestRecorder {
   static MUTATIONS_PLACEHOLDER = '[MUTATIONS_PLACEHOLDER]'
   static DO_NOT_RECORD = 'doNotRecord'
 
-  constructor () {
+  /**
+   * @param config you can override this
+   */
+  constructor (config: Config = Config) {
 
     let nightwatchGenerator = new NightwatchGenerator()
     let emberCLIGenerator = new EmberCLIGenerator()
@@ -155,6 +165,10 @@ export class TestRecorder {
 
   insertMutationsToGeneratedScript () {
 
+    //don't add the assertino code if we didn't find any mutations of interest
+    if (!this.cachedMutations.length) {
+      return
+    }
     // removeConflictingMutations by retrieving last values of a given path
     var lastUniqueItems = {};
     this.cachedMutations.forEach(item => {
@@ -163,13 +177,12 @@ export class TestRecorder {
 
     this.cachedMutations = (Object as any).values(lastUniqueItems)
 
-    let final =  this.cachedMutations.map((item:MutationEntry)=>item.generatedCode).join("<br>")
-    this.setGeneratedScript(this.generatedTestCode.replace(TestRecorder.MUTATIONS_PLACEHOLDER,final))
+    let final = this.cachedMutations.map((item: MutationEntry) => item.generatedCode).join("<br>")
+    let newCode = this.currentUserEvent.mutationCode.replace(TestRecorder.MUTATIONS_PLACEHOLDER, final)
+    this.generatedTestCode += newCode
+    this.setGeneratedScript(this.generatedTestCode)
     this.cachedMutations = []
   }
-
-
-
 
   setGeneratedScript (code) {
     this.generatedTestCode = code
@@ -177,11 +190,12 @@ export class TestRecorder {
     this.hostElement.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
   }
 
-  appendToGeneratedScript (code) {
-    this.generatedTestCode += code
-    //todo perhaps use Object.observe once FF supports it
+  appendToGeneratedScript (userEvent: UserEvent) {
+    this.currentUserEvent = userEvent
+    this.generatedTestCode += userEvent.playbackCode
     this.hostElement.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
-    Prism.highlightAll()
+    //todo get prism to work
+    // Prism.highlightAll()
   }
 
   /*  window.addEventListener("hashchange", function (e) {
@@ -238,15 +252,15 @@ export class TestRecorder {
     }
 
     addedNodesArray.forEach((node) => {
-      addedNodesMutationEntries.push( this.currentCodeGenerator.elementAdded(node.id))
+      addedNodesMutationEntries.push(this.currentCodeGenerator.elementAdded(node.id))
     })
 
     removedNodesArray.forEach((node) => {
-      removedNodesMutationEntries.push( this.currentCodeGenerator.elementRemoved(node.id))
+      removedNodesMutationEntries.push(this.currentCodeGenerator.elementRemoved(node.id))
     })
 
     // this sends this new changes back
-    this.cachedMutations = this.cachedMutations.concat(addedNodesMutationEntries.length? addedNodesMutationEntries : removedNodesMutationEntries)
+    this.cachedMutations = this.cachedMutations.concat(addedNodesMutationEntries.length ? addedNodesMutationEntries : removedNodesMutationEntries)
   }
 
   addObserverForTarget (target, recursionDepth) {

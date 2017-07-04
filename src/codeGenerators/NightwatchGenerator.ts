@@ -2,6 +2,7 @@ import formattingRules from '../util/formattingRules'
 import { TestRecorder } from '../TestRecorder'
 import { ICodeGenerator } from './ICodeGenerator'
 import { MutationEntry } from '../util/MutationEntry'
+import { UserEvent } from '../util/UserEvent'
 
 export class NightwatchGenerator implements ICodeGenerator {
   lastRoute: string = ''
@@ -11,49 +12,36 @@ export class NightwatchGenerator implements ICodeGenerator {
     // tslint:disable-line
   }
 
-  selectChange (queryPath, event: Event) {
+  selectChange (queryPath, event: Event): UserEvent {
     let target = event.target as HTMLSelectElement
     let newSelectedIndex = target.selectedIndex
     let newValue = (target.options[newSelectedIndex] as HTMLOptionElement).value
-    let code = `
-browser.click('${queryPath} [value="${newValue}"]')
-browser.pause(500)
+
+    return new UserEvent(
+      `browser.click('${queryPath} [value="${newValue}"]')
+      `,
+`browser.pause(500)
 ${TestRecorder.MUTATIONS_PLACEHOLDER}`
-    return code
+    )
   }
 
-  clickHappened (queryPath: string) {
-    let code = `
+  clickHappened (queryPath: string): UserEvent {
+    return new UserEvent(`
 browser.click('${queryPath}')
-browser.pause(500)
+`,
+`browser.pause(500)
 ${TestRecorder.MUTATIONS_PLACEHOLDER}`
-    return code
+    )
   }
 
-  inputTextEdited (queryPath, newValue) {
-    let code = `
+  inputTextEdited (queryPath, newValue): UserEvent {
+
+    return new UserEvent(`
 browser.setValue('${queryPath}', '${newValue}')
-browser.pause(500)
+`,
+`browser.pause(500)
 ${TestRecorder.MUTATIONS_PLACEHOLDER}`
-    return code
-  }
-
-  routeChanged () {
-
-    if (this.lastRoute !== this.getCurrentRoute()) {
-      // x  this.lastRoute = this.getCurrentRoute()
-      let code = formattingRules.indentation + '.assert.equal(currentRouteName(), "' +
-        this.getCurrentRoute() + '", "The page navigates to ' + this.getCurrentRoute() +
-        ' on button click")<br/>'
-      return code
-    }
-    return ''
-  }
-
-  getCurrentRoute () {
-    let isIndex = window.location.pathname === '/'
-    let pathArray = window.location.pathname.split('/')
-    return isIndex ? 'index' : pathArray[1]
+    )
   }
 
   elementAdded (id): MutationEntry {

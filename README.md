@@ -4,9 +4,7 @@
 If this project is useful to you and you would like to support it, you are most welcome to buy me a coffee! https://ko-fi.com/A325GAE
 
 # test-recorder
-The test-recorder is an ambitious project that aims to record integration tests for any web application. It also provides assertions to changes in your DOM structure.
-
-I am currently focused on getting the tests compatible with nightwish, Ember CLI and soon: angular 4.
+The test-recorder records acceptance tests for the Ember-cli and Nightwatch testing frameworks.
 
 This project records the ways you interact with your application and then generates the code to playback these actions inside an acceptance test runner. 
 The idea is to save you time writing these tests by hand.

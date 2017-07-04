@@ -1,7 +1,7 @@
 import { TestRecorder } from '../../src/TestRecorder'
 import './index.pcss'
 
-let testRecorder = new TestRecorder()
+new TestRecorder()
 
 document.querySelector('.makeDiv').addEventListener('click', function () {
   let newElement: HTMLElement = document.createElement('div')
@@ -16,7 +16,6 @@ document.querySelector('.makeDiv').addEventListener('click', function () {
   newElement2.id = 'new-element2'
   document.querySelector('#buttonClickMutation').appendChild(newElement2)
   document.querySelector('#buttonClickMutation').removeChild(newElement2)
-
 
 })
 document.querySelector('#removeDiv').addEventListener('click', function () {
