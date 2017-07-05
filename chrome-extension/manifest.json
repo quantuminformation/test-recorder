@@ -1,14 +1,26 @@
 {
-  "manifest_version": 1,
+  "manifest_version": 2,
   "name": "Test Recorder",
   "description": " The test-recorder records acceptance tests for the Ember-cli and Nightwatch testing frameworks. ",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "browser_action": {
-    "default_icon": "icon.png",
-    "default_popup": "popup.html"
+
+  },
+  "background": {
+    "scripts": ["background.js"]
   },
   "permissions": [
     "activeTab",
-    "https://ajax.googleapis.com/"
+    "tabs",
+    "<all_urls>"
+
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": ["test-recorder.js"]
+    }
   ]
 }

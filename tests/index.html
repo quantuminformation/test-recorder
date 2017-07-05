@@ -3,6 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
+
+  <style>
+    .dropDiv {
+      width: 40px;
+      height: 40px;
+      padding: 4px;
+      border: 1px solid #aaaaaa;
+    }
+  </style>
 </head>
 <body>
 <h1>Test recorder sample application</h1>
@@ -41,6 +50,18 @@
     </select></td>
     <td>change</td>
     <td id="selectMutation">Initial Value select</td>
+  </tr>
+  <tr>
+    <td>
+      <div class="dropDiv"  >
+        <img id="drag1" src="../logo.png" draggable="true"
+              width="30">
+      </div>
+    </td>
+    <td>ondrop</td>
+    <td>
+      <div class="dropDiv" ></div>
+    </td>
   </tr>
 </table>
 

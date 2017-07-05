@@ -10,7 +10,6 @@ import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator";
 import { MutationEntry } from "./util/MutationEntry";
 import { Config } from "./Config";
 import { UserEvent } from "./util/UserEvent";
-declare var VERSION
 
 //declare var Prism
 
@@ -89,7 +88,7 @@ export class TestRecorder {
     })
     document.querySelector('.info').addEventListener('click', () => {
       //   alert(`Version: ${VERSION}`)
-      alert(`Version: 0.13`)
+      alert(`Version: 0.2.0`)
     })
     document.querySelector('#debug').addEventListener('click', () => {
       console.log(this.cachedMutations)
@@ -247,7 +246,7 @@ export class TestRecorder {
 
     // mutations should be mutually exclusive?
     if (addedNodesArray.length && removedNodesArray.length) {
-      alert('strange')
+      console.log('strange, both added and removed, investigate')
       return
     }
 

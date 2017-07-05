@@ -43,3 +43,18 @@ document.querySelector('#select').addEventListener('change', function (event) {
   mutationElement.innerText = newValue
 })
 
+//drag stuff
+Array.from(document.querySelectorAll('.dropDiv')).forEach((element) => {
+  element.addEventListener('drop', (event:any) => {
+    event.preventDefault();
+    var data = event.dataTransfer.getData("text");
+    event.target.appendChild(document.getElementById(data));
+  })
+  element.addEventListener('dragover', (event) => {
+    event.preventDefault();
+  })
+})
+
+document.querySelector('#drag1').addEventListener('dragstart', (event:any) => {
+  event.dataTransfer.setData("text", event.target.id);
+})
