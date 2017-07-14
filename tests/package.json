@@ -1,13 +1,13 @@
 {
   "devDependencies": {
-    "awesome-typescript-loader": "^1.0.0",
+    "awesome-typescript-loader": "^3.2.1",
     "babel-core": "^6.24.0",
-    "babel-loader": "^6.4.1",
+    "babel-loader": "^7.1.1",
     "chromedriver": "^2.28.0",
-    "css-loader": "^0.26.1",
+    "css-loader": "^0.28.4",
     "html-webpack-plugin": "^2.24.1",
     "typescript": "^2.1.4",
-    "webpack": "2.2.0",
+    "webpack": "3.2.0",
     "webpack-build-notifier": "^0.1.13"
   }
 }

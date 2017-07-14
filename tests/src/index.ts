@@ -47,10 +47,10 @@ function init() {
 
 //drag stuff
   Array.from(document.querySelectorAll('.dropDiv')).forEach((element) => {
-    element.addEventListener('drop', (event) => {
+    element.addEventListener('drop', (event:DragEvent) => {
       event.preventDefault();
       var data = event.dataTransfer.getData("text");
-      event.target.appendChild(document.getElementById(data));
+      (event.target as HTMLElement).appendChild(document.getElementById(data));
     })
     element.addEventListener('dragover', (event) => {
       event.preventDefault();
