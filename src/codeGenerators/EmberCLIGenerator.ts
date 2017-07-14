@@ -41,7 +41,8 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}
   inputTextEdited (queryPath, newValue): UserEvent {
 
     return new UserEvent(`
-fillIn('${queryPath}', '${newValue}')`,
+fillIn('${queryPath}', '${newValue}')
+  `,
       `andThen(function () {
 ${TestRecorder.MUTATIONS_PLACEHOLDER}
 });

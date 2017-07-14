@@ -1,6 +1,6 @@
 export default {
   indentation: '  ',
-  get indentationX2() {
+  get indentationX2 () {
     return this.indentation + this.indentation
   }
 }

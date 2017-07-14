@@ -32,6 +32,7 @@ export class TestRecorder {
   lastRoute: ''
   cachedMutations: MutationEntry[] = [] //this stores the changes made from mutations until we want to insert them into the generated code
   hostElement: HTMLElement
+  codeOutputDiv: HTMLElement
 
   static MUTATIONS_PLACEHOLDER = '[MUTATIONS_PLACEHOLDER]'
   static DO_NOT_RECORD = 'doNotRecord'
@@ -69,12 +70,17 @@ export class TestRecorder {
 
     document.body.appendChild(ui.firstChild)
 
-    let codeOutputDiv = document.getElementById('generatedScript')
-    this.hostElement = codeOutputDiv
+    this.hostElement = document.getElementById('testRecorderUI')
+    this.codeOutputDiv =document.getElementById('generatedScript')
     //this will iterate through this node and watch for changes and store them until we want to display them
     this.addObserverForTarget(rootDomNode, 0)
     // this.setGeneratedScript(this.currentCodeGenerator.initialCode())
     this.addListeners()
+  }
+
+  destroy () {
+    this.hostElement.parentElement.removeChild(this.hostElement)
+    //todo remove listeners
   }
 
   /**
@@ -84,7 +90,7 @@ export class TestRecorder {
 
     //test recorder UI--------------------------------------------------------------------
     document.querySelector('#copy').addEventListener('click', () => {
-      copyTextToClipboard(this.hostElement.textContent)
+      copyTextToClipboard(this.codeOutputDiv.textContent)
     })
     document.querySelector('.info').addEventListener('click', () => {
       //   alert(`Version: ${VERSION}`)
@@ -186,13 +192,13 @@ export class TestRecorder {
   setGeneratedScript (code) {
     this.generatedTestCode = code
     //todo perhaps use Object.observe once FF supports it
-    this.hostElement.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
+    this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
   }
 
   appendToGeneratedScript (userEvent: UserEvent) {
     this.currentUserEvent = userEvent
     this.generatedTestCode += userEvent.playbackCode
-    this.hostElement.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
+    this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
     //todo get prism to work
     // Prism.highlightAll()
   }
@@ -382,3 +388,24 @@ function get_Path_To_Nearest_Class_or_Id (path) {
   return path
 }
 
+// chrome extension handler
+declare var chrome: any
+var testRecorder
+if (chrome.runtime.onMessage) {
+  chrome.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) {
+      if (!testRecorder) {
+        testRecorder = new TestRecorder()
+        return
+      }
+      testRecorder.destroy()
+      testRecorder = null
+
+      /*    console.log(sender.tab ?
+       "from a content script:" + sender.tab.url :
+       "from the extension");
+       if (request.greeting == "hello") {
+       sendResponse({ farewell: "goodbye" });
+       }*/
+    });
+}
