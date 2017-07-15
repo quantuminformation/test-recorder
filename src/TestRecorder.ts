@@ -71,7 +71,7 @@ export class TestRecorder {
     document.body.appendChild(ui.firstChild)
 
     this.hostElement = document.getElementById('testRecorderUI')
-    this.codeOutputDiv =document.getElementById('generatedScript')
+    this.codeOutputDiv = document.getElementById('generatedScript')
     //this will iterate through this node and watch for changes and store them until we want to display them
     this.addObserverForTarget(rootDomNode, 0)
     // this.setGeneratedScript(this.currentCodeGenerator.initialCode())
@@ -393,7 +393,7 @@ declare var chrome: any
 var testRecorder
 if (chrome.runtime.onMessage) {
   chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) {
+    function () {
       if (!testRecorder) {
         testRecorder = new TestRecorder()
         return
@@ -401,11 +401,5 @@ if (chrome.runtime.onMessage) {
       testRecorder.destroy()
       testRecorder = null
 
-      /*    console.log(sender.tab ?
-       "from a content script:" + sender.tab.url :
-       "from the extension");
-       if (request.greeting == "hello") {
-       sendResponse({ farewell: "goodbye" });
-       }*/
     });
 }

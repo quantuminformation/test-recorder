@@ -1,7 +1,7 @@
-/tests/build
+tests/build
 npm-debug.log
 testem.log
-/.idea
-/dist
+.idea
+dist
 node_modules
-/build
+build

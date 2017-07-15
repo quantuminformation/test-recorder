@@ -12,6 +12,13 @@ The idea is to save you time writing these tests by hand.
 You should only add the TestRecorder.js script to your app when your app behaves as
 expected (happy flow) as then you will have the tests generated for this. You can then take these tests and modify them to your specific needs.
 
+# Chrome extension
+The Test Recorder has now been made into a [Chrome extension](https://chrome.google.com/webstore/detail/test-recorder/mehbmedddkpilcbbjcichiopegameghh) which makes it real easy for anyone to start recording tests in the browser. I include how it works in this video: as I bonus I also include my pastime of Skiing in London.
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=HhJFD3jr0oo
+" target="_blank"><img src="http://img.youtube.com/vi/HhJFD3jr0oo/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
+
 # Browser compatibility
 
 As this is a pure dev tool, I only support recording your Applications on Chrome due to it having the features I need. I will support other browsers if I get enough support.
