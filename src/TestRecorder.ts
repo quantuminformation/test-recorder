@@ -20,7 +20,7 @@ export class TestRecorder {
 
   codeGenerators: Map<string, ICodeGenerator>
 
-  currentCodeGenerator: ICodeGenerator
+  currentCodeGenerator: IComutdeGenerator
   currentUserEvent: UserEvent
 
   mutationObserversArr: MutationObserver[] = []
@@ -242,8 +242,8 @@ export class TestRecorder {
     let removedNodesArray = Array.prototype.slice.call(mutationRecord.removedNodes)
 
     // this array is used to generate the source code, we filter
-    addedNodesArray = addedNodesArray.filter(mutationUtils.filter_DoNotRecord_WhiteSpace_emberID_noID)
-    removedNodesArray = removedNodesArray.filter(mutationUtils.filter_DoNotRecord_WhiteSpace_emberID_noID)
+    addedNodesArray = addedNodesArray.filter(mutationUtils.isElementRecorded)
+    removedNodesArray = removedNodesArray.filter(mutationUtils.isElementRecorded)
 
     if (!addedNodesArray.length && !removedNodesArray.length) {
       //no point continuing in this iteration if nothing of interest
@@ -328,7 +328,19 @@ function findNthChildIndex (element: HTMLElement) {
  * @param e event from the DOM that we want to workout the testing path.
  */
 function getPlaybackPath (e: any) {
-  if (e.target.id) {
+
+  let testHelper: string
+  for (var i in e.target.dataset) {
+    if (i.match(/^test*/)) {
+      testHelper = `data-${i}`.replace(/([A-Z])/g, "-$1").replace(/^-/, '').toLowerCase()
+      break
+    }
+  }
+
+  if (testHelper) {
+    return `[${testHelper}]`
+  }
+  else if (e.target.id) {
     return '#' + e.target.id
   } else {
     let path = get_Path_To_Nearest_Class_or_Id(getPathUpTillBody(e.path)).reverse()
@@ -354,6 +366,7 @@ function isAnyElementInPathClassOrChildOfClass (path: HTMLElement[], className) 
   }
   return false
 }
+
 function isElementClassOrChildOfClass (element: HTMLElement, className): boolean {
   let classListArray = element.classList && Array.prototype.slice.call(element.classList)
   let hasDoNotRecordClass = classListArray ? (classListArray.indexOf('doNotRecord') !== -1) : false

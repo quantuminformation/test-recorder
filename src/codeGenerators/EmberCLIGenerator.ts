@@ -18,9 +18,9 @@ export class EmberCLIGenerator implements ICodeGenerator {
     // let newValue = (target.options[newSelectedIndex] as HTMLOptionElement).value
 
     return new UserEvent(
-      `Ember.$('${queryPath}').trigger({type:'mouseup', which:1})
+`fillIn('${queryPath}','${(event.target as HTMLOptionElement).value}')
 `,
-      `andThen(function () {
+`andThen(function () {
 ${TestRecorder.MUTATIONS_PLACEHOLDER}
 })
 `
