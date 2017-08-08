@@ -11,6 +11,8 @@ import { MutationEntry } from "./util/MutationEntry";
 import { Config } from "./Config";
 import { UserEvent } from "./util/UserEvent";
 
+declare let require
+
 //declare var Prism
 
 /**
@@ -20,7 +22,7 @@ export class TestRecorder {
 
   codeGenerators: Map<string, ICodeGenerator>
 
-  currentCodeGenerator: IComutdeGenerator
+  currentCodeGenerator: ICodeGenerator
   currentUserEvent: UserEvent
 
   mutationObserversArr: MutationObserver[] = []
@@ -94,7 +96,7 @@ export class TestRecorder {
     })
     document.querySelector('.info').addEventListener('click', () => {
       //   alert(`Version: ${VERSION}`)
-      alert(`Version: 0.2.0`)
+      alert(`Version: ${require('../package.json').version}`)
     })
     document.querySelector('#debug').addEventListener('click', () => {
       console.log(this.cachedMutations)
