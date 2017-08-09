@@ -10,6 +10,7 @@ import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator";
 import { MutationEntry } from "./util/MutationEntry";
 import { Config } from "./Config";
 import { UserEvent } from "./util/UserEvent";
+import SolarPopup from  'solar-popup'
 
 declare let require
 
@@ -61,10 +62,13 @@ export class TestRecorder {
           <span id="clear" >&#x1F6AB;</span>
           <span id="debug">&#x1F41B;</span>
           <button id="copy">Copy</button>
+          <span class="info" >&#x1F3F7;</span>
+          <span class="settings" >&#x2699;</span>
           <select id="framework-choice">
             ${Array.from(this.codeGenerators.keys()).map(item => `<option value="${item}">${item}</option>`).join('')}
           </select>
-          <span class="info" >&#x1F3F7;</span>
+          <span class="minimise" >_</span>
+          <span class="resize" >&#x1F5D6;</span>
         </div>
         <div id="generatedScript" class="language-javascript"></div> 
         </div>
@@ -95,8 +99,26 @@ export class TestRecorder {
       copyTextToClipboard(this.codeOutputDiv.textContent)
     })
     document.querySelector('.info').addEventListener('click', () => {
-      //   alert(`Version: ${VERSION}`)
       alert(`Version: ${require('../package.json').version}`)
+    })
+    document.querySelector('.settings').addEventListener('click', () => {
+      let el = document.createElement('div')
+      el.innerHTML = `<h2>Record all elements? By default only elements with id's or data-test* attributes are recorded.</h2>
+      <input type="checkbox"> 
+     
+      `
+
+      let popup = new SolarPopup(el)
+      popup.show()
+    })
+    document.querySelector('.minimise').addEventListener('click', () => {
+      this.hostElement.style.height = "30px"
+
+    })
+    document.querySelector('.resize').addEventListener('click', () => {
+      this.hostElement.style.height = "300px"
+
+
     })
     document.querySelector('#debug').addEventListener('click', () => {
       console.log(this.cachedMutations)

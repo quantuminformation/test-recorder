@@ -14,6 +14,7 @@
   z-index: 1000 !important;
   resize: both !important;
   overflow: auto !important;
+  transition: all 100ms ease;
 
   .header {
     background-color: rgba(204, 250, 255, 0.9) !important;
@@ -30,13 +31,13 @@
     font-size: 12px;
     max-width: 80px !important;
   }
-  #clear, #debug, .info {
+  .header > span {
     cursor: pointer !important;
-    font-size: 13px !important;
-    padding: 2px !important;
-  }
-  .info {
-    float: right !important;
+    font-size: 16px !important;
+    padding: 4px !important;
+    &:hover{
+      background-color: #0b97c4;
+    }
   }
   #generatedScript {
     padding: 4px !important;

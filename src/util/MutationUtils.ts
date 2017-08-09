@@ -17,8 +17,10 @@ export default {
     // 4 things with an ember id, (where a user has not given one but ember needs to add an id)
     let hasEmberIdRegex = /ember[\d]+/
 
+    let hasIdOrUserAllowsNonIdRecording = node.id // || todo user setting
+
     return node.nodeType !== 3 && // 1 whitespace
-      (node.id || testHelper) && // does it have and or a data-test attribute
+      (hasIdOrUserAllowsNonIdRecording || testHelper) && // does it have and or a data-test attribute
       !hasDoNotRecordClass &&    // 3 things that have a hasDoNotRecordClass
       !hasEmberIdRegex.test(node.id)
   },
