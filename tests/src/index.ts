@@ -10,7 +10,13 @@ function init() {
     newElement.innerHTML =
       `<p>Generated Div and P</p>`
     newElement.id = 'new-element'
+
+    let newElementWithNoId = document.createElement('div')
+    newElementWithNoId.innerHTML =
+      `<p>Generated Div and P 2</p>`
+
     document.querySelector('#buttonClickMutation').appendChild(newElement)
+    document.querySelector('#buttonClickMutation').appendChild(newElementWithNoId)
 
     let newElement2 = document.createElement('div')
     newElement2.innerHTML =
