@@ -50,12 +50,12 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}
     )
   }
 
-  elementAdded (id) {
-    return new MutationEntry(`#${id}`, `${formattingRules.indentationX2}assert.equal(find('#${id}').length, 1, '${id} shown AFTER user [INSERT REASON]');`)
+  elementAdded (queryPath: string) {
+    return new MutationEntry(queryPath, `${formattingRules.indentationX2}assert.equal(find('${queryPath}').length, 1, '${queryPath} shown AFTER user [INSERT REASON]');`)
   }
 
-  elementRemoved (id) {
-    return new MutationEntry(`#${id}`, `${formattingRules.indentationX2}assert.equal(find('#${id}').length, 0, '${id} removed AFTER user [INSERT REASON]');`)
+  elementRemoved (queryPath: string) {
+    return new MutationEntry(queryPath, `${formattingRules.indentationX2}assert.equal(find('${queryPath}').length, 0, '${queryPath} removed AFTER user [INSERT REASON]');`)
   }
 
   characterDataChanged (record: MutationRecord) {

@@ -8,11 +8,13 @@ import { copyTextToClipboard } from './util/clipboard'
 import { ICodeGenerator } from './codeGenerators/ICodeGenerator'
 import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator";
 import { MutationEntry } from "./util/MutationEntry";
-import { Config } from "./Config";
 import { UserEvent } from "./util/UserEvent";
-import SolarPopup from  'solar-popup'
+import SolarPopup from 'solar-popup'
+import { Settings } from "./Settings";
 
 declare let require
+
+debugger
 
 //declare var Prism
 
@@ -43,8 +45,7 @@ export class TestRecorder {
   /**
    * @param config you can override this
    */
-  constructor (config: Config = Config) {
-
+  constructor () {
     let nightwatchGenerator = new NightwatchGenerator()
     let emberCLIGenerator = new EmberCLIGenerator()
     this.codeGenerators = new Map([
@@ -56,13 +57,15 @@ export class TestRecorder {
 
     let rootDomNode = document.querySelector('body')
     let ui = document.createElement('div')
+
+    // language=HTML
     ui.innerHTML =
-      `<div id="testRecorderUI" class="doNotRecord">
-        <div class="header">
+      `<div id="testRecorderUI" class="${TestRecorder.DO_NOT_RECORD}">
+          <div class="header">
           <span id="clear" >&#x1F6AB;</span>
           <span id="debug">&#x1F41B;</span>
           <button id="copy">Copy</button>
-          <span class="info" >&#x1F3F7;</span>
+           <span class="info" >&#x1F3F7;</span>
           <span class="settings" >&#x2699;</span>
           <select id="framework-choice">
             ${Array.from(this.codeGenerators.keys()).map(item => `<option value="${item}">${item}</option>`).join('')}
@@ -103,13 +106,30 @@ export class TestRecorder {
     })
     document.querySelector('.settings').addEventListener('click', () => {
       let el = document.createElement('div')
-      el.innerHTML = `<h2>Record all elements? By default only elements with id's or data-test* attributes are recorded.</h2>
-      <input type="checkbox"> 
-     
+
+      console.log(Settings.get().recordAll)
+      // language=HTML
+      el.innerHTML = `
+        <h3>Test Recorder settings</h3>
+        <p>This stores the settings in your local storage for the current web URL</p>
+        <form>
+          <p title="By default only elements with id's or data-test* attributes are recorded.">
+            Record all elements?<input name="recordAll" type="checkbox" ${Settings.get().recordAll ? "checked" : ""}>
+          </p>
+          <button>Save</button>
+        </form>
       `
 
+      el.addEventListener('submit', (e) => {
+        let settings = {
+          recordAll: (<HTMLInputElement> el.querySelector('[name="recordAll"]')).checked,
+        }
+        Settings.save(settings)
+      })
       let popup = new SolarPopup(el)
+      popup.hostElement.classList.add(TestRecorder.DO_NOT_RECORD)
       popup.show()
+
     })
     document.querySelector('.minimise').addEventListener('click', () => {
       this.hostElement.style.height = "30px"
@@ -160,7 +180,7 @@ export class TestRecorder {
         return
       }
 
-      let newTestPrint = this.currentCodeGenerator.clickHappened(getPlaybackPath(e))
+      let newTestPrint = this.currentCodeGenerator.clickHappened(getPlaybackPath(e.target, e.path))
       this.appendToGeneratedScript(newTestPrint)
       this.awaitMutations()
     })
@@ -172,7 +192,7 @@ export class TestRecorder {
 
       //setsUpSelect input watching
       if (e.target.localName === 'select') {
-        let newCode = this.currentCodeGenerator.selectChange(getPlaybackPath(e), e)
+        let newCode = this.currentCodeGenerator.selectChange(getPlaybackPath(e.target, e.path), e)
         this.appendToGeneratedScript(newCode)
         this.awaitMutations()
 
@@ -185,7 +205,7 @@ export class TestRecorder {
       }
 
       if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
-        let newCode = this.currentCodeGenerator.inputTextEdited(getPlaybackPath(e), e.target.value)
+        let newCode = this.currentCodeGenerator.inputTextEdited(getPlaybackPath(e.target, e.path), e.target.value)
         this.appendToGeneratedScript(newCode)
         this.awaitMutations()
       }
@@ -281,15 +301,28 @@ export class TestRecorder {
     }
 
     addedNodesArray.forEach((node) => {
-      addedNodesMutationEntries.push(this.currentCodeGenerator.elementAdded(node.id))
+      let selector = getPlaybackPath(node, this.getPath(node))
+      addedNodesMutationEntries.push(this.currentCodeGenerator.elementAdded(selector))
     })
 
     removedNodesArray.forEach((node) => {
-      removedNodesMutationEntries.push(this.currentCodeGenerator.elementRemoved(node.id))
+      let selector = getPlaybackPath(node, this.getPath(node))
+      removedNodesMutationEntries.push(this.currentCodeGenerator.elementRemoved(selector))
     })
 
     // this sends this new changes back
     this.cachedMutations = this.cachedMutations.concat(addedNodesMutationEntries.length ? addedNodesMutationEntries : removedNodesMutationEntries)
+  }
+
+  getPath (element: HTMLElement): HTMLElement[] {
+    debugger
+    const path: HTMLElement[] = []
+    let currentElement = element
+    while (currentElement) {
+      path.push(currentElement)
+      currentElement = element.parentElement
+    }
+    return path
   }
 
   addObserverForTarget (target, recursionDepth) {
@@ -351,10 +384,10 @@ function findNthChildIndex (element: HTMLElement) {
  *
  * @param e event from the DOM that we want to workout the testing path.
  */
-function getPlaybackPath (e: any) {
+function getPlaybackPath (element: HTMLElement, path: HTMLElement[]) {
 
   let testHelper: string
-  for (var i in e.target.dataset) {
+  for (var i in element.dataset) {
     if (i.match(/^test*/)) {
       testHelper = `data-${i}`.replace(/([A-Z])/g, "-$1").replace(/^-/, '').toLowerCase()
       break
@@ -364,12 +397,13 @@ function getPlaybackPath (e: any) {
   if (testHelper) {
     return `[${testHelper}]`
   }
-  else if (e.target.id) {
-    return '#' + e.target.id
+  else if (element.id) {
+    return '#' + element.id
   } else {
-    let path = get_Path_To_Nearest_Class_or_Id(getPathUpTillBody(e.path)).reverse()
+    let newPath =getPathUpTillBody(path)
+    newPath = get_Path_To_Nearest_Class_or_Id(newPath).reverse()
 
-    let fullPath = path.map(function (element: HTMLElement) {
+    let fullPath = newPath.map(function (element: HTMLElement) {
       // we need to make each path segment more specific if other siblings of the same type exist
       let index = findNthChildIndex(element)
       let idPart = element.id ? `#${element.id}` : ""

@@ -20,7 +20,7 @@ export class NightwatchGenerator implements ICodeGenerator {
     return new UserEvent(
       `browser.click('${queryPath} [value="${newValue}"]')
       `,
-`browser.pause(500)
+      `browser.pause(500)
 ${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
@@ -29,7 +29,7 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
     return new UserEvent(`
 browser.click('${queryPath}')
 `,
-`browser.pause(500)
+      `browser.pause(500)
 ${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
@@ -39,17 +39,17 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
     return new UserEvent(`
 browser.setValue('${queryPath}', '${newValue}')
 `,
-`browser.pause(500)
+      `browser.pause(500)
 ${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
 
-  elementAdded (id): MutationEntry {
-    return new MutationEntry(`#${id}`, `browser.expect.element('#${id}').to.be.present`)
+  elementAdded (queryPath: string): MutationEntry {
+    return new MutationEntry(`${queryPath}`, `browser.expect.element('${queryPath}').to.be.present`)
   }
 
-  elementRemoved (id): MutationEntry {
-    return new MutationEntry(`#${id}`, `browser.expect.element('#${id}').to.not.be.present`)
+  elementRemoved (queryPath: string): MutationEntry {
+    return new MutationEntry(`${queryPath}`, `browser.expect.element('${queryPath}').to.not.be.present`)
   }
 
   characterDataChanged (record: MutationRecord): MutationEntry {

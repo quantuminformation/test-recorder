@@ -1,5 +1,7 @@
-export default {
+import { Settings } from '../Settings'
+import { Regexes } from '../Regexes'
 
+export default {
   isElementRecorded (node: HTMLElement) {
     let classListArray = node.classList && Array.prototype.slice.call(node.classList)
     // let isEmberView = classListArray ? (classListArray.indexOf("ember-view") === -1) : false;
@@ -12,17 +14,14 @@ export default {
       }
     }
 
-    // the check here is we don't want to record
+    let hasIdOrUserAllowsNonIdRecording = node.id || Settings.get().recordAll
+    console.log(Settings.get())
 
-    // 4 things with an ember id, (where a user has not given one but ember needs to add an id)
-    let hasEmberIdRegex = /ember[\d]+/
-
-    let hasIdOrUserAllowsNonIdRecording = node.id // || todo user setting
-
-    return node.nodeType !== 3 && // 1 whitespace
+    return node.parentElement && // if it doesn't have a parent then its a "weird" thing
+      node.nodeType !== 3 && // 1 whitespace
       (hasIdOrUserAllowsNonIdRecording || testHelper) && // does it have and or a data-test attribute
       !hasDoNotRecordClass &&    // 3 things that have a hasDoNotRecordClass
-      !hasEmberIdRegex.test(node.id)
+      !Regexes.hasEmberIdRegex.test(node.id)
   },
 
   filterDoNotRecordAndWhiteSpace (node) {

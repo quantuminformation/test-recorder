@@ -1,10 +1,8 @@
 import { TestRecorder } from '../../src/TestRecorder'
 import './index.pcss'
-
 new TestRecorder()
 
 function init() {
-
   document.querySelector('.makeDiv').addEventListener('click', function () {
     let newElement = document.createElement('div')
     newElement.innerHTML =
