@@ -1,6 +1,11 @@
 import { TestRecorder } from '../../src/TestRecorder'
 import './index.pcss'
-new TestRecorder()
+
+// delay the recorder setup
+setTimeout(()=> {
+  new TestRecorder()
+},500)
+
 
 function init() {
   document.querySelector('.makeDiv').addEventListener('click', function () {

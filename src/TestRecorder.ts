@@ -1,5 +1,4 @@
 //todo perhaps use typescript to have these as interface implementation
-import mutationUtils from './util/MutationUtils'
 import { NightwatchGenerator } from './codeGenerators/NightwatchGenerator'
 import './styles/app.pcss'
 import { copyTextToClipboard } from './util/clipboard'
@@ -11,10 +10,9 @@ import { MutationEntry } from "./util/MutationEntry";
 import { UserEvent } from "./util/UserEvent";
 import SolarPopup from 'solar-popup'
 import { Settings } from "./Settings";
+import PathTools, { isElementClassOrChildOfClass } from "./util/PathTools";
 
 declare let require
-
-debugger
 
 //declare var Prism
 
@@ -82,7 +80,7 @@ export class TestRecorder {
     this.hostElement = document.getElementById('testRecorderUI')
     this.codeOutputDiv = document.getElementById('generatedScript')
     //this will iterate through this node and watch for changes and store them until we want to display them
-    this.addObserverForTarget(rootDomNode, 0)
+    this.addObserverForTarget(rootDomNode)
     // this.setGeneratedScript(this.currentCodeGenerator.initialCode())
     this.addListeners()
   }
@@ -286,8 +284,8 @@ export class TestRecorder {
     let removedNodesArray = Array.prototype.slice.call(mutationRecord.removedNodes)
 
     // this array is used to generate the source code, we filter
-    addedNodesArray = addedNodesArray.filter(mutationUtils.isElementRecorded)
-    removedNodesArray = removedNodesArray.filter(mutationUtils.isElementRecorded)
+    addedNodesArray = addedNodesArray.filter(PathTools.isElementRecorded)
+    removedNodesArray = removedNodesArray.filter(PathTools.isElementRecorded)
 
     if (!addedNodesArray.length && !removedNodesArray.length) {
       //no point continuing in this iteration if nothing of interest
@@ -315,17 +313,16 @@ export class TestRecorder {
   }
 
   getPath (element: HTMLElement): HTMLElement[] {
-    debugger
     const path: HTMLElement[] = []
     let currentElement = element
     while (currentElement) {
       path.push(currentElement)
-      currentElement = element.parentElement
+      currentElement = currentElement.parentElement
     }
     return path
   }
 
-  addObserverForTarget (target, recursionDepth) {
+  addObserverForTarget (target) {
     let observer = new MutationObserver((mutations) => {
       mutations.forEach((mutationRecord: MutationRecord) => {
 
@@ -400,7 +397,7 @@ function getPlaybackPath (element: HTMLElement, path: HTMLElement[]) {
   else if (element.id) {
     return '#' + element.id
   } else {
-    let newPath =getPathUpTillBody(path)
+    let newPath = getPathUpTillBody(path)
     newPath = get_Path_To_Nearest_Class_or_Id(newPath).reverse()
 
     let fullPath = newPath.map(function (element: HTMLElement) {
@@ -421,19 +418,6 @@ function isAnyElementInPathClassOrChildOfClass (path: HTMLElement[], className) 
     if (Array.from(path[i].classList).indexOf(className) !== -1) {
       return true
     }
-  }
-  return false
-}
-
-function isElementClassOrChildOfClass (element: HTMLElement, className): boolean {
-  let classListArray = element.classList && Array.prototype.slice.call(element.classList)
-  let hasDoNotRecordClass = classListArray ? (classListArray.indexOf('doNotRecord') !== -1) : false
-
-  if (hasDoNotRecordClass) {
-    return true
-  }
-  if (element.parentElement) {
-    return isElementClassOrChildOfClass(element.parentElement, className)
   }
   return false
 }
