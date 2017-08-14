@@ -4,9 +4,9 @@ import { ICodeGenerator } from './ICodeGenerator'
 import { MutationEntry } from '../util/MutationEntry'
 import { UserEvent } from '../util/UserEvent'
 
-export class NightwatchGenerator implements ICodeGenerator {
+export class ChromelessGenerator implements ICodeGenerator {
   lastRoute: string = ''
-  description: string = 'NightWatch'
+  description: string = 'Chromeless'
 
   constructor () {
     // tslint:disable-line
@@ -45,11 +45,11 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
   }
 
   elementAdded (queryPath: string): MutationEntry {
-    return new MutationEntry(`${queryPath}`, `browser.expect.element('${queryPath}').to.be.present`)
+    return new MutationEntry(`${queryPath}`, `chromeless.wait('${queryPath}')`)
   }
 
   elementRemoved (queryPath: string): MutationEntry {
-    return new MutationEntry(`${queryPath}`, `browser.expect.element('${queryPath}').to.not.be.present`)
+    return new MutationEntry(`${queryPath}`, `chromeless.wait('${queryPath}')`)
   }
 
   characterDataChanged (record: MutationRecord): MutationEntry {

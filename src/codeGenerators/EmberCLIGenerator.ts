@@ -6,7 +6,7 @@ import { UserEvent } from '../util/UserEvent'
 
 export class EmberCLIGenerator implements ICodeGenerator {
   lastRoute: string = ''
-  description: string = 'EMBER_CLI'
+  description: string = 'Ember'
 
   constructor () {
     // tslint:disable-line

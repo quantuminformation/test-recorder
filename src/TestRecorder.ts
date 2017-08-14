@@ -6,11 +6,12 @@ import { copyTextToClipboard } from './util/clipboard'
 //import  'prismjs/components/prism-javascript'
 import { ICodeGenerator } from './codeGenerators/ICodeGenerator'
 import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator";
+import { ChromelessGenerator } from "./codeGenerators/Chromeless";
 import { MutationEntry } from "./util/MutationEntry";
 import { UserEvent } from "./util/UserEvent";
 import SolarPopup from 'solar-popup'
 import { Settings } from "./Settings";
-import PathTools, { isElementClassOrChildOfClass } from "./util/PathTools";
+import PathTools, { getPath, isElementClassOrChildOfClass } from "./util/PathTools";
 
 declare let require
 
@@ -46,15 +47,24 @@ export class TestRecorder {
   constructor () {
     let nightwatchGenerator = new NightwatchGenerator()
     let emberCLIGenerator = new EmberCLIGenerator()
+    let chromelessGenerator = new ChromelessGenerator()
     this.codeGenerators = new Map([
       [emberCLIGenerator.description, emberCLIGenerator],
       [nightwatchGenerator.description, nightwatchGenerator],
+      [chromelessGenerator.description, chromelessGenerator],
     ])
-
-    this.currentCodeGenerator = this.codeGenerators.values().next().value
 
     let rootDomNode = document.querySelector('body')
     let ui = document.createElement('div')
+
+    console.log(Settings.get().currentCodeGenerator)
+    //apply settings
+    if (Settings.get().currentCodeGenerator) {
+      this.currentCodeGenerator = this.codeGenerators.get(Settings.get().currentCodeGenerator)
+    }
+    if (!this.currentCodeGenerator) {
+      this.currentCodeGenerator = this.codeGenerators.values().next().value
+    }
 
     // language=HTML
     ui.innerHTML =
@@ -66,7 +76,8 @@ export class TestRecorder {
            <span class="info" >&#x1F3F7;</span>
           <span class="settings" >&#x2699;</span>
           <select id="framework-choice">
-            ${Array.from(this.codeGenerators.keys()).map(item => `<option value="${item}">${item}</option>`).join('')}
+            ${Array.from(this.codeGenerators.keys()).map(item =>
+        `<option value="${item}" ${item === this.currentCodeGenerator.description ? "selected" : ""}>${item}</option>`).join('')}
           </select>
           <span class="minimise" >_</span>
           <span class="resize" >&#x1F5D6;</span>
@@ -83,6 +94,8 @@ export class TestRecorder {
     this.addObserverForTarget(rootDomNode)
     // this.setGeneratedScript(this.currentCodeGenerator.initialCode())
     this.addListeners()
+
+
   }
 
   destroy () {
@@ -148,6 +161,7 @@ export class TestRecorder {
     document.querySelector('#framework-choice').addEventListener('change', (event: any) => {
       let newValue = (event.target.options[event.target.selectedIndex]).value
       this.currentCodeGenerator = this.codeGenerators.get(newValue)
+      Settings.saveItem("currentCodeGenerator", this.currentCodeGenerator.description)
     })
 
     /**
@@ -299,12 +313,12 @@ export class TestRecorder {
     }
 
     addedNodesArray.forEach((node) => {
-      let selector = getPlaybackPath(node, this.getPath(node))
+      let selector = getPlaybackPath(node, getPath(node))
       addedNodesMutationEntries.push(this.currentCodeGenerator.elementAdded(selector))
     })
 
     removedNodesArray.forEach((node) => {
-      let selector = getPlaybackPath(node, this.getPath(node))
+      let selector = getPlaybackPath(node, getPath(node))
       removedNodesMutationEntries.push(this.currentCodeGenerator.elementRemoved(selector))
     })
 
@@ -312,15 +326,7 @@ export class TestRecorder {
     this.cachedMutations = this.cachedMutations.concat(addedNodesMutationEntries.length ? addedNodesMutationEntries : removedNodesMutationEntries)
   }
 
-  getPath (element: HTMLElement): HTMLElement[] {
-    const path: HTMLElement[] = []
-    let currentElement = element
-    while (currentElement) {
-      path.push(currentElement)
-      currentElement = currentElement.parentElement
-    }
-    return path
-  }
+  2
 
   addObserverForTarget (target) {
     let observer = new MutationObserver((mutations) => {
@@ -446,7 +452,7 @@ function get_Path_To_Nearest_Class_or_Id (path) {
 // chrome extension handler
 declare var chrome: any
 var testRecorder
-if (chrome.runtime.onMessage) {
+if (chrome && chrome.runtime.onMessage) {
   chrome.runtime.onMessage.addListener(
     function () {
       if (!testRecorder) {

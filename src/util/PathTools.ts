@@ -64,3 +64,13 @@ function isNodeChildOfBody (element: HTMLElement): boolean {
   }
   return false
 }
+
+export function getPath (element: HTMLElement): HTMLElement[] {
+  const path: HTMLElement[] = []
+  let currentElement = element
+  while (currentElement) {
+    path.push(currentElement)
+    currentElement = currentElement.parentElement
+  }
+  return path
+}
