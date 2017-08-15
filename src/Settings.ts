@@ -21,6 +21,7 @@ export let Settings = {
     this.save(currentData)
   },
   get (): SettingsObj {
-    return JSON.parse(localStorage.getItem('settings'))
+    let value = JSON.parse(localStorage.getItem('settings'))
+    return value ? value : {}
   }
 }
