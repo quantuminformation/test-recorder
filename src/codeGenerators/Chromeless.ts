@@ -18,29 +18,26 @@ export class ChromelessGenerator implements ICodeGenerator {
     let newValue = (target.options[newSelectedIndex] as HTMLOptionElement).value
 
     return new UserEvent(
-      `browser.click('${queryPath} [value="${newValue}"]')
+      `chromeless.click('${queryPath} [value="${newValue}"]')
       `,
-      `browser.pause(500)
-${TestRecorder.MUTATIONS_PLACEHOLDER}`
+      `${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
 
   clickHappened (queryPath: string): UserEvent {
     return new UserEvent(`
-browser.click('${queryPath}')
+chromeless.click('${queryPath}')
 `,
-      `browser.pause(500)
-${TestRecorder.MUTATIONS_PLACEHOLDER}`
+      `${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
 
   inputTextEdited (queryPath, newValue): UserEvent {
 
     return new UserEvent(`
-browser.setValue('${queryPath}', '${newValue}')
+chromeless.type('${newValue}', '${queryPath}')
 `,
-      `browser.pause(500)
-${TestRecorder.MUTATIONS_PLACEHOLDER}`
+      `${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
 
@@ -52,6 +49,7 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
     return new MutationEntry(`${queryPath}`, `chromeless.wait('${queryPath}')`)
   }
 
+  // todo get correct assertion for this
   characterDataChanged (record: MutationRecord): MutationEntry {
     let el = record.target as HTMLElement
     return new MutationEntry(`#${el.parentElement.id}`, `browser.assert.containsText('#${el.parentElement.id}','${el.nodeValue}')`)

@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Test Recorder",
   "description": " The test-recorder records acceptance tests for the Ember-cli and Nightwatch testing frameworks.",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "browser_action": {
 
   },

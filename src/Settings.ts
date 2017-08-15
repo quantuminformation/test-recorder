@@ -6,6 +6,9 @@
 type SettingsObj = {
   recordAll: boolean,
   currentCodeGenerator: string
+  persistCode: boolean,
+  keepOpen: string
+  generatedTestCode: string
 }
 
 export let Settings = {

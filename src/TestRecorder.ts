@@ -57,7 +57,6 @@ export class TestRecorder {
     let rootDomNode = document.querySelector('body')
     let ui = document.createElement('div')
 
-    console.log(Settings.get().currentCodeGenerator)
     //apply settings
     if (Settings.get().currentCodeGenerator) {
       this.currentCodeGenerator = this.codeGenerators.get(Settings.get().currentCodeGenerator)
@@ -92,10 +91,12 @@ export class TestRecorder {
     this.codeOutputDiv = document.getElementById('generatedScript')
     //this will iterate through this node and watch for changes and store them until we want to display them
     this.addObserverForTarget(rootDomNode)
-    // this.setGeneratedScript(this.currentCodeGenerator.initialCode())
     this.addListeners()
-
-
+    if (Settings.get().persistCode) {
+      if (Settings.get().generatedTestCode) {
+        this.codeOutputDiv.innerHTML = '<pre>' + Settings.get().generatedTestCode + '</pre>'
+      }
+    }
   }
 
   destroy () {
@@ -118,15 +119,22 @@ export class TestRecorder {
     document.querySelector('.settings').addEventListener('click', () => {
       let el = document.createElement('div')
 
-      console.log(Settings.get().recordAll)
       // language=HTML
       el.innerHTML = `
         <h3>Test Recorder settings</h3>
         <p>This stores the settings in your local storage for the current web URL</p>
         <form>
-          <p title="By default only elements with id's or data-test* attributes are recorded.">
-            Record all elements?<input name="recordAll" type="checkbox" ${Settings.get().recordAll ? "checked" : ""}>
-          </p>
+        <ul>
+          <li title="By default only elements with id's or data-test* attributes are recorded">
+            Record all elements<input name="recordAll" type="checkbox" ${Settings.get().recordAll ? "checked" : ""}>
+          </li>
+          <li title="Useful for page refreshes">
+            Persist code<input name="persistCode" type="checkbox" ${Settings.get().persistCode ? "checked" : ""}>
+          </li>
+          <li title="Opens on page refreshes">
+            Keep recorder open<input name="keepOpen" type="checkbox" ${Settings.get().keepOpen ? "checked" : ""}>
+          </li>
+          </ul>
           <button>Save</button>
         </form>
       `
@@ -134,6 +142,8 @@ export class TestRecorder {
       el.addEventListener('submit', (e) => {
         let settings = {
           recordAll: (<HTMLInputElement> el.querySelector('[name="recordAll"]')).checked,
+          keepOpen: (<HTMLInputElement> el.querySelector('[name="keepOpen"]')).checked,
+          persistCode: (<HTMLInputElement> el.querySelector('[name="persistCode"]')).checked,
         }
         Settings.save(settings)
       })
@@ -247,14 +257,24 @@ export class TestRecorder {
 
   setGeneratedScript (code) {
     this.generatedTestCode = code
-    //todo perhaps use Object.observe once FF supports it
     this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
+    if (Settings.get().persistCode) {
+      Settings.saveItem("generatedTestCode", this.generatedTestCode)
+    } else {
+      Settings.saveItem("generatedTestCode", "")
+    }
   }
 
   appendToGeneratedScript (userEvent: UserEvent) {
     this.currentUserEvent = userEvent
     this.generatedTestCode += userEvent.playbackCode
     this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
+    if (Settings.get().persistCode) {
+      Settings.saveItem("generatedTestCode", this.generatedTestCode)
+    } else {
+      Settings.saveItem("generatedTestCode", "")
+    }
+
     //todo get prism to work
     // Prism.highlightAll()
   }
@@ -449,18 +469,25 @@ function get_Path_To_Nearest_Class_or_Id (path) {
   return path
 }
 
+// open the recorder if user specifies
+var testRecorder: TestRecorder
+if (Settings.get().keepOpen) {
+  testRecorder = new TestRecorder()
+}
+``
 // chrome extension handler
 declare var chrome: any
-var testRecorder
-if (chrome && chrome.runtime.onMessage) {
-  chrome.runtime.onMessage.addListener(
-    function () {
-      if (!testRecorder) {
-        testRecorder = new TestRecorder()
-        return
-      }
-      testRecorder.destroy()
-      testRecorder = null
 
-    });
-}
+setTimeout(() => {
+  if (chrome && chrome.runtime) {
+    chrome.runtime.onMessage.addListener(
+      function () {
+        if (!testRecorder) {
+          testRecorder = new TestRecorder()
+          return
+        }
+        testRecorder.destroy()
+        testRecorder = null
+      });
+  }
+}, 2100)

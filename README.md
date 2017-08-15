@@ -5,6 +5,7 @@ If this project is useful to you and you would like to support it, you are most 
 
 # test-recorder
 The test-recorder records acceptance tests for the Ember-cli and Nightwatch testing frameworks.
+I am currently doing a WIP for Chromeless, but it is available in the Chrome extension
 
 This project records the ways you interact with your application and then generates the code to playback these actions inside an acceptance test runner. 
 The idea is to save you time writing these tests by hand.
@@ -42,6 +43,12 @@ alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
 * Button clicks
 * Text input 
 * Changes in DOM additions/removals (only if they have an id)
+
+# Settings
+If you click on the settings (cog wheel) button a popup opens with various options:
+* Record all elements— this records mutations on all elements, default unchecked: only records elements with id's
+* Persist code — Saves the generated code to the output screen. This is useful for single page apps that refresh the page.
+* Keep recorder open - if the page is refreshed with the recorder open, it will open again.
 
 # Notes
 
