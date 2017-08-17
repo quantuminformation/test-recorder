@@ -67,7 +67,7 @@ export class TestRecorder {
 
     // language=HTML
     ui.innerHTML =
-      `<div id="testRecorderUI" class="${TestRecorder.DO_NOT_RECORD}">
+      `<div id="testRecorderUI" class="${TestRecorder.DO_NOT_RECORD}" draggable=true>
           <div class="header">
           <span id="clear" >&#x1F6AB;</span>
           <span id="debug">&#x1F41B;</span>
@@ -81,7 +81,7 @@ export class TestRecorder {
           <span class="minimise" >_</span>
           <span class="resize" >&#x1F5D6;</span>
         </div>
-        <div id="generatedScript" class="language-javascript"></div> 
+        <div id="generatedScript" class="language-javascript"></div>
         </div>
     </div> `
 
@@ -92,6 +92,7 @@ export class TestRecorder {
     //this will iterate through this node and watch for changes and store them until we want to display them
     this.addObserverForTarget(rootDomNode)
     this.addListeners()
+    this.setUpDragAndDrop(this.hostElement, document)
     if (Settings.get().persistCode) {
       if (Settings.get().generatedTestCode) {
         this.codeOutputDiv.innerHTML = '<pre>' + Settings.get().generatedTestCode + '</pre>'
@@ -232,6 +233,32 @@ export class TestRecorder {
         this.awaitMutations()
       }
     })
+  }
+
+  setUpDragAndDrop(source, target) {
+    let testRecorderDragstart = (ev) => {
+      let style = window.getComputedStyle(ev.target, null)
+      target.addEventListener('dragover', testRecorderDragover)
+      target.addEventListener('drop', testRecorderDrop)
+      ev.dataTransfer.setData('text/plain', `${(parseInt(style.getPropertyValue('left'),10) - ev.clientX)}, ${(parseInt(style.getPropertyValue('top'),10) - ev.clientY)}`)
+    }
+    let testRecorderDragover = (ev) => {
+      source.style.visibility = 'hidden'
+      ev.preventDefault()
+    }
+    let testRecorderDrop = (ev) => {
+      let offset = ev.dataTransfer.getData('text/plain').split(',')
+      source.style.left = (ev.clientX + parseInt(offset[0],10)) + 'px'
+      source.style.top = (ev.clientY + parseInt(offset[1],10)) + 'px'
+      event.preventDefault();
+    }
+    let testRecorderDragend = (ev) => {
+      source.style.visibility = 'visible'
+      target.removeEventListener('dragover', testRecorderDragover)
+      target.removeEventListener('drop', testRecorderDrop)
+    }
+    source.addEventListener('dragstart', testRecorderDragstart)
+    source.addEventListener('dragend', testRecorderDragend)
   }
 
   insertMutationsToGeneratedScript () {
