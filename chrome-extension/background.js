@@ -6,4 +6,15 @@ chrome.browserAction.onClicked.addListener(function (activeTab) {
   });
 });
 
-
+chrome.runtime.onInstalled.addListener(
+  function() {
+    chrome.tabs.query({}, function (tabs) {
+      tabs.forEach(function(tab) {
+        chrome.tabs.executeScript(tab.id, { file: './test-recorder.js' }, function() {
+          let error = chrome.runtime.lastError;
+          if (error) console.log(error);
+        });
+      });
+    });
+  }
+)
