@@ -1,5 +1,5 @@
 import { TestRecorder } from '../../src/TestRecorder'
-import './index.pcss'
+import './index'
 
 // delay the recorder setup
 setTimeout(()=> {
@@ -17,18 +17,29 @@ function init() {
     let newElementWithNoId = document.createElement('div')
     newElementWithNoId.innerHTML =
       `<p>Generated Div and P 2</p>`
-
     document.querySelector('#buttonClickMutation').appendChild(newElement)
     document.querySelector('#buttonClickMutation').appendChild(newElementWithNoId)
 
+    // add and remove stuff to see if they are both recorded
     let newElement2 = document.createElement('div')
     newElement2.innerHTML =
       `<p>Generated Div and P 2</p>`
     newElement2.id = 'new-element2'
     document.querySelector('#buttonClickMutation').appendChild(newElement2)
     document.querySelector('#buttonClickMutation').removeChild(newElement2)
-
   })
+
+  document.querySelector('[data-test-foo2="baa"]').addEventListener('click', function () {
+    let newElementWithDataTest = document.createElement('div')
+    newElementWithDataTest.innerHTML =
+      `<p>Generated Div with data-test attr</p>`
+    newElementWithDataTest.dataset['data-test-created-div']
+
+    document.querySelector('#buttonClickMutation').appendChild(newElementWithDataTest)
+    document.querySelector('#buttonClickMutation').appendChild(newElementWithDataTest)
+  })
+
+
   document.querySelector('#removeDiv').addEventListener('click', function () {
     let existingEl = document.querySelector('#new-element')
     if (existingEl) {
