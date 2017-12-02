@@ -2,6 +2,7 @@ language: node_js
 node_js:
   - "7"
 install:
+  - npm install
   - npm --prefix ./tests install
   - npm --prefix ./tests/nightwatch install
 cache:
