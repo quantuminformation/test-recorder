@@ -2,7 +2,8 @@ language: node_js
 node_js:
   - "7"
 install:
-  - npm --prefix ./tests install ./tests
+  - npm --prefix ./tests install
+  - npm --prefix ./tests/nightwatch install
 cache:
   directories:
   - node_modules
@@ -10,4 +11,4 @@ cache:
   - test/sandbox/nightwatch/node_modules
 
 before_script:
-  - npm --prefix ./tests start ./tests &
+  - npm --prefix ./tests start  &
