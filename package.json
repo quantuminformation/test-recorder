@@ -9,7 +9,7 @@
   "scripts": {
     "test": "npm run lint & npm run --prefix ./tests/nightwatch test ",
     "webdriver": "webdriver-manager start --standalone",
-    "lint": "tslint src/**/*.ts",
+    "lint": "npm run tslint src/**/*.ts",
     "build-ext": "webpack && cp build/test-recorder.js chrome-extension/test-recorder.js"
   },
   "repository": {
