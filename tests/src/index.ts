@@ -1,4 +1,4 @@
-import { TestRecorder } from '../../src/TestRecorder'
+import { TestRecorder } from '../../src'
 import './index'
 
 // delay the recorder setup
@@ -33,7 +33,7 @@ function init() {
     let newElementWithDataTest = document.createElement('div')
     newElementWithDataTest.innerHTML =
       `<p>Generated Div with data-test attr</p>`
-    newElementWithDataTest.dataset['data-test-created-div']
+    newElementWithDataTest.dataset['testCreatedDiv'] = 'foo'
 
     document.querySelector('#buttonClickMutation').appendChild(newElementWithDataTest)
     document.querySelector('#buttonClickMutation').appendChild(newElementWithDataTest)

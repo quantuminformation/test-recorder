@@ -16,12 +16,12 @@ export default {
     }
     // if its not child of the body then its a 'weird' thing
     if (!isNodeChildOfBody(node)) {
-      return false
+   //   return false
     }
 
     // ember test selectors pass
     for (let i in node.dataset) {
-      if (i.match(/^data-test*/)) {
+      if (i.match(/^test*/)) {
         return true
       }
     }

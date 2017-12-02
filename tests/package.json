@@ -1,13 +1,24 @@
 {
   "devDependencies": {
-    "awesome-typescript-loader": "^3.2.1",
+    "awesome-typescript-loader": "^3.4.1",
     "babel-core": "^6.24.0",
     "babel-loader": "^7.1.1",
     "chromedriver": "^2.28.0",
     "css-loader": "^0.28.4",
     "html-webpack-plugin": "^2.24.1",
-    "typescript": "^2.1.4",
-    "webpack": "3.2.0",
-    "webpack-build-notifier": "^0.1.13"
+    "http-server": "^0.10.0",
+    "postcss-calc": "^6.0.1",
+    "postcss-css-variables": "^0.8.0",
+    "postcss-custom-media": "^6.0.0",
+    "postcss-import": "^11.0.0",
+    "postcss-loader": "^2.0.9",
+    "postcss-nested": "^2.1.2",
+    "style-loader": "^0.19.0",
+    "typescript": "^2.6.2",
+    "webpack": "3.9.1",
+    "webpack-build-notifier": "^0.1.18"
+  },
+  "scripts": {
+    "start": " http-server './build'"
   }
 }

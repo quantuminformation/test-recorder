@@ -1,4 +1,4 @@
-<img src="https://codeship.com/projects/75fa7d90-fc5b-0134-0f39-32469d5c0e33/status?branch=master"/>
+[![Build Status](https://travis-ci.org/QuantumInformation/test-recorder.svg?branch=master)](https://travis-ci.org/QuantumInformation/test-recorder)
 
 # Sponsors
 If you would like to be an official supporter of this project, please contact me, and I will place your logo here!

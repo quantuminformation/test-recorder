@@ -18,7 +18,7 @@ export class NightwatchGenerator implements ICodeGenerator {
     let newValue = (target.options[newSelectedIndex] as HTMLOptionElement).value
 
     return new UserEvent(
-      `browser.click('${queryPath} [value="${newValue}"]')
+      `.click('${queryPath} [value="${newValue}"]')
       `,
       `browser.pause(500)
 ${TestRecorder.MUTATIONS_PLACEHOLDER}`
@@ -27,10 +27,9 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
 
   clickHappened (queryPath: string): UserEvent {
     return new UserEvent(`
-browser.click('${queryPath}')
+.click('${queryPath}')
 `,
-      `browser.pause(500)
-${TestRecorder.MUTATIONS_PLACEHOLDER}`
+      `${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
 
@@ -45,16 +44,16 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
   }
 
   elementAdded (queryPath: string): MutationEntry {
-    return new MutationEntry(`${queryPath}`, `browser.expect.element('${queryPath}').to.be.present`)
+    return new MutationEntry(`${queryPath}`, `.waitForElementPresent('${queryPath}', 1000)`)
   }
 
   elementRemoved (queryPath: string): MutationEntry {
-    return new MutationEntry(`${queryPath}`, `browser.expect.element('${queryPath}').to.not.be.present`)
+    return new MutationEntry(`${queryPath}`, `.waitForElementNotPresent('${queryPath}', 1000)`)
   }
 
   characterDataChanged (record: MutationRecord): MutationEntry {
     let el = record.target as HTMLElement
-    return new MutationEntry(`#${el.parentElement.id}`, `browser.assert.containsText('#${el.parentElement.id}','${el.nodeValue}')`)
+    return new MutationEntry(`#${el.parentElement.id}`, `.assert.containsText('#${el.parentElement.id}','${el.nodeValue}')`)
   }
 
 }

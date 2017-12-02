@@ -1,0 +1,21 @@
+{
+  "name": "nightwatch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "chromedriver": "^2.33.2",
+    "nightwatch": "^0.9.16",
+    "selenium-server-standalone-jar": "^3.7.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "nightwatch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -5,13 +5,13 @@ import { copyTextToClipboard } from './util/clipboard'
 //import  'prismjs'
 //import  'prismjs/components/prism-javascript'
 import { ICodeGenerator } from './codeGenerators/ICodeGenerator'
-import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator";
-import { ChromelessGenerator } from "./codeGenerators/Chromeless";
-import { MutationEntry } from "./util/MutationEntry";
-import { UserEvent } from "./util/UserEvent";
+import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator"
+import { ChromelessGenerator } from "./codeGenerators/Chromeless"
+import { MutationEntry } from "./util/MutationEntry"
+import { UserEvent } from "./util/UserEvent"
 import SolarPopup from 'solar-popup'
-import { Settings } from "./Settings";
-import PathTools, { getPath, isElementClassOrChildOfClass } from "./util/PathTools";
+import { Settings } from "./Settings"
+import PathTools, { getPath, isElementClassOrChildOfClass } from "./util/PathTools"
 
 declare let require
 
@@ -21,6 +21,9 @@ declare let require
  * Default tests that are generated are for Nightwatch
  */
 export class TestRecorder {
+
+  // defaults
+  defaultFontSizePx: number = 8
 
   codeGenerators: Map<string, ICodeGenerator>
 
@@ -51,7 +54,7 @@ export class TestRecorder {
     this.codeGenerators = new Map([
       [emberCLIGenerator.description, emberCLIGenerator],
       [nightwatchGenerator.description, nightwatchGenerator],
-      [chromelessGenerator.description, chromelessGenerator],
+      [chromelessGenerator.description, chromelessGenerator]
     ])
 
     let rootDomNode = document.querySelector('body')
@@ -91,16 +94,29 @@ export class TestRecorder {
     this.codeOutputDiv = document.getElementById('generatedScript')
     //this will iterate through this node and watch for changes and store them until we want to display them
     this.addObserverForTarget(rootDomNode)
-    this.addListeners()
+    this.setupTestRecorderUI_and_app_Events()
     this.setUpDragAndDrop(this.hostElement, document)
+
+    //load settings
     if (Settings.get().persistCode) {
       if (Settings.get().generatedTestCode) {
         this.codeOutputDiv.innerHTML = '<pre>' + Settings.get().generatedTestCode + '</pre>'
       }
     }
+    this.updateFontSize()
+  }
+
+  updateFontSize () {
+    if (Settings.get().codeFontSize) {
+      this.codeOutputDiv.style.fontSize = `${Settings.get().codeFontSize}px`
+    } else {
+      this.codeOutputDiv.style.fontSize = `${this.defaultFontSizePx}px`
+
+    }
   }
 
   destroy () {
+    console.log("removing test recorder")
     this.hostElement.parentElement.removeChild(this.hostElement)
     //todo remove listeners
   }
@@ -108,7 +124,7 @@ export class TestRecorder {
   /**
    * listen to events of various type bubbling up to the document
    */
-  addListeners () {
+  setupTestRecorderUI_and_app_Events () {
 
     //test recorder UI--------------------------------------------------------------------
     document.querySelector('#copy').addEventListener('click', () => {
@@ -135,6 +151,9 @@ export class TestRecorder {
           <li title="Opens on page refreshes">
             Keep recorder open<input name="keepOpen" type="checkbox" ${Settings.get().keepOpen ? "checked" : ""}>
           </li>
+          <li title="The size of the generated code in pixels">
+            Code size px<input name="codeFontSize" type="number" value="${Settings.get().codeFontSize ? Settings.get().codeFontSize : 10}">
+          </li>
           </ul>
           <button>Save</button>
         </form>
@@ -145,8 +164,12 @@ export class TestRecorder {
           recordAll: (<HTMLInputElement> el.querySelector('[name="recordAll"]')).checked,
           keepOpen: (<HTMLInputElement> el.querySelector('[name="keepOpen"]')).checked,
           persistCode: (<HTMLInputElement> el.querySelector('[name="persistCode"]')).checked,
+          codeFontSize: (<HTMLInputElement> el.querySelector('[name="codeFontSize"]')).value
         }
         Settings.save(settings)
+
+        // update UI
+        this.updateFontSize()
       })
       let popup = new SolarPopup(el)
       popup.hostElement.classList.add(TestRecorder.DO_NOT_RECORD)
@@ -159,7 +182,6 @@ export class TestRecorder {
     })
     document.querySelector('.resize').addEventListener('click', () => {
       this.hostElement.style.height = "300px"
-
 
     })
     document.querySelector('#debug').addEventListener('click', () => {
@@ -227,7 +249,7 @@ export class TestRecorder {
         return
       }
 
-      if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
+      if (e.target.tagName === 'INPUT' && (e.target.type === 'text' || e.target.type === 'textArea')) {
         let newCode = this.currentCodeGenerator.inputTextEdited(getPlaybackPath(e.target, e.path), e.target.value)
         this.appendToGeneratedScript(newCode)
         this.awaitMutations()
@@ -235,12 +257,12 @@ export class TestRecorder {
     })
   }
 
-  setUpDragAndDrop(source, target) {
+  setUpDragAndDrop (source, target) {
     let testRecorderDragstart = (ev) => {
       let style = window.getComputedStyle(ev.target, null)
       target.addEventListener('dragover', testRecorderDragover)
       target.addEventListener('drop', testRecorderDrop)
-      ev.dataTransfer.setData('text/plain', `${(parseInt(style.getPropertyValue('left'),10) - ev.clientX)}, ${(parseInt(style.getPropertyValue('top'),10) - ev.clientY)}`)
+      ev.dataTransfer.setData('text/plain', `${(parseInt(style.getPropertyValue('left'), 10) - ev.clientX)}, ${(parseInt(style.getPropertyValue('top'), 10) - ev.clientY)}`)
     }
     let testRecorderDragover = (ev) => {
       source.style.visibility = 'hidden'
@@ -248,9 +270,9 @@ export class TestRecorder {
     }
     let testRecorderDrop = (ev) => {
       let offset = ev.dataTransfer.getData('text/plain').split(',')
-      source.style.left = (ev.clientX + parseInt(offset[0],10)) + 'px'
-      source.style.top = (ev.clientY + parseInt(offset[1],10)) + 'px'
-      event.preventDefault();
+      source.style.left = (ev.clientX + parseInt(offset[0], 10)) + 'px'
+      source.style.top = (ev.clientY + parseInt(offset[1], 10)) + 'px'
+      event.preventDefault()
     }
     let testRecorderDragend = (ev) => {
       source.style.visibility = 'visible'
@@ -268,7 +290,7 @@ export class TestRecorder {
       return
     }
     // removeConflictingMutations by retrieving last values of a given path
-    var lastUniqueItems = {};
+    var lastUniqueItems = {}
     this.cachedMutations.forEach(item => {
       lastUniqueItems[item.path] = item
     })
@@ -373,9 +395,10 @@ export class TestRecorder {
     this.cachedMutations = this.cachedMutations.concat(addedNodesMutationEntries.length ? addedNodesMutationEntries : removedNodesMutationEntries)
   }
 
-  2
-
-  addObserverForTarget (target) {
+  /**
+   * this is the heart ond soul of the assertions
+   */
+  addObserverForTarget (target: HTMLElement) {
     let observer = new MutationObserver((mutations) => {
       mutations.forEach((mutationRecord: MutationRecord) => {
 
@@ -439,7 +462,11 @@ function getPlaybackPath (element: HTMLElement, path: HTMLElement[]) {
   let testHelper: string
   for (var i in element.dataset) {
     if (i.match(/^test*/)) {
+      //convert something like testFoo to data-test-foo
       testHelper = `data-${i}`.replace(/([A-Z])/g, "-$1").replace(/^-/, '').toLowerCase()
+      if(element.dataset[i]){
+        testHelper += `="${element.dataset[i]}"`
+      }
       break
     }
   }
@@ -499,22 +526,39 @@ function get_Path_To_Nearest_Class_or_Id (path) {
 // open the recorder if user specifies
 var testRecorder: TestRecorder
 if (Settings.get().keepOpen) {
+  console.log("opening test recorder automatically")
+  console.log(Settings.get())
   testRecorder = new TestRecorder()
 }
 ``
 // chrome extension handler
 declare var chrome: any
 
+/*var port = chrome.runtime.connect('ibjkbgeclcimkbjklkggflanmjfcjefo');
+
+window.addEventListener("message", function(event) {
+  // We only accept messages from ourselves
+  if (event.source != window)
+    return;
+
+  if (event.data.type && (event.data.type == "FROM_PAGE")) {
+    console.log("Content script received: " + event.data.text);
+    port.postMessage(event.data.text);
+  }
+}, false);*/
+
 setTimeout(() => {
-  if (chrome && chrome.runtime) {
+  if (chrome && chrome.runtime && chrome.runtime.onMessage) {
     chrome.runtime.onMessage.addListener(
       function () {
         if (!testRecorder) {
+          console.log("Extension button click opening test recorder")
           testRecorder = new TestRecorder()
           return
         }
+        console.log("Extension button clicked closing already open test recorder")
         testRecorder.destroy()
         testRecorder = null
-      });
+      })
   }
 }, 2100)

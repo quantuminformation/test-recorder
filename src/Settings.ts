@@ -9,6 +9,7 @@ type SettingsObj = {
   persistCode: boolean,
   keepOpen: string
   generatedTestCode: string
+  codeFontSize: number
 }
 
 export let Settings = {
