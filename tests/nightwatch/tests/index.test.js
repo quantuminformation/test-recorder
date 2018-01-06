@@ -1,4 +1,4 @@
-const rootUrl = 'http://127.0.0.1:8080'
+const rootUrl = 'http://127.0.0.1:8099'
 this.checkGeneratedPathForClickOnNoIdElement = function (browser) {
   browser.url(`${rootUrl}`)
     .click('table#interactions>tbody>tr:nth-child(2)>td:nth-child(1)>button:nth-child(1)')

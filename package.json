@@ -7,7 +7,7 @@
   ],
   "main": "build/test-recorder.js",
   "scripts": {
-    "test": "npm run lint & npm run --prefix ./tests/nightwatch test ",
+    "test": "npm run lint & npm run --prefix ./tests start & npm run --prefix ./tests/nightwatch test ",
     "lint": "tslint src/**/*.ts"
   },
   "repository": {

@@ -19,6 +19,6 @@
     "webpack-build-notifier": "^0.1.18"
   },
   "scripts": {
-    "start": " http-server './build'"
+    "start": " http-server './build' -p 8099"
   }
 }
