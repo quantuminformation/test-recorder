@@ -9,7 +9,7 @@
   "dependencies": {
     "chromedriver": "^2.33.2",
     "nightwatch": "^0.9.16",
-    "selenium-server-standalone-jar": "^3.7.1"
+    "selenium-server-standalone-jar": "3.7.1"
   },
   "devDependencies": {},
   "scripts": {
