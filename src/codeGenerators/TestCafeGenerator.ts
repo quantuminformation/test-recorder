@@ -4,9 +4,9 @@ import { ICodeGenerator } from './ICodeGenerator'
 import { MutationEntry } from '../util/MutationEntry'
 import { UserEvent } from '../util/UserEvent'
 
-export class NightwatchGenerator implements ICodeGenerator {
+export class TestCafeGenerator implements ICodeGenerator {
   lastRoute: string = ''
-  description: string = 'NightWatch'
+  description: string = 'TestCafe'
 
   constructor () {
     // tslint:disable-line
@@ -20,8 +20,7 @@ export class NightwatchGenerator implements ICodeGenerator {
     return new UserEvent(
       `.click('${queryPath} [value="${newValue}"]')
       `,
-      `browser.pause(500)
-${TestRecorder.MUTATIONS_PLACEHOLDER}`
+      `${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
 
@@ -36,10 +35,9 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
   inputTextEdited (queryPath, newValue): UserEvent {
 
     return new UserEvent(`
-.setValue('${queryPath}', '${newValue}')
+typeText('${queryPath}', '${newValue}')
 `,
-      `browser.pause(500)
-${TestRecorder.MUTATIONS_PLACEHOLDER}`
+      `${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
 

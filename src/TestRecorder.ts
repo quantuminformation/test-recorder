@@ -6,7 +6,7 @@ import { copyTextToClipboard } from './util/clipboard'
 //import  'prismjs/components/prism-javascript'
 import { ICodeGenerator } from './codeGenerators/ICodeGenerator'
 import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator"
-import { ChromelessGenerator } from "./codeGenerators/Chromeless"
+import { TestCafeGenerator } from "./codeGenerators/TestCafeGenerator"
 import { MutationEntry } from "./util/MutationEntry"
 import { UserEvent } from "./util/UserEvent"
 import SolarPopup from 'solar-popup'
@@ -50,11 +50,11 @@ export class TestRecorder {
   constructor () {
     let nightwatchGenerator = new NightwatchGenerator()
     let emberCLIGenerator = new EmberCLIGenerator()
-    let chromelessGenerator = new ChromelessGenerator()
+    let testCafeGenerator = new TestCafeGenerator()
     this.codeGenerators = new Map([
       [emberCLIGenerator.description, emberCLIGenerator],
       [nightwatchGenerator.description, nightwatchGenerator],
-      [chromelessGenerator.description, chromelessGenerator]
+      [testCafeGenerator.description, testCafeGenerator]
     ])
 
     let rootDomNode = document.querySelector('body')
