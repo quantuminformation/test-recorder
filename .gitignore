@@ -5,3 +5,4 @@ testem.log
 dist
 node_modules
 build
+.history

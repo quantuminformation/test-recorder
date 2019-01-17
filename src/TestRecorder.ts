@@ -10,10 +10,11 @@ import { ChromelessGenerator } from "./codeGenerators/Chromeless"
 import { MutationEntry } from "./util/MutationEntry"
 import { UserEvent } from "./util/UserEvent"
 import SolarPopup from 'solar-popup'
-import { Settings } from "./Settings"
+import { localSettings } from "./LocalSettings"
 import PathTools, { getPath, isElementClassOrChildOfClass } from "./util/PathTools"
 
 declare let require
+
 
 //declare var Prism
 
@@ -60,9 +61,9 @@ export class TestRecorder {
     let rootDomNode = document.querySelector('body')
     let ui = document.createElement('div')
 
-    //apply settings
-    if (Settings.get().currentCodeGenerator) {
-      this.currentCodeGenerator = this.codeGenerators.get(Settings.get().currentCodeGenerator)
+    //apply LocalSettings
+    if (localSettings.get().currentCodeGenerator) {
+      this.currentCodeGenerator = this.codeGenerators.get(LocalSettings.get().currentCodeGenerator)
     }
     if (!this.currentCodeGenerator) {
       this.currentCodeGenerator = this.codeGenerators.values().next().value
@@ -97,18 +98,18 @@ export class TestRecorder {
     this.setupTestRecorderUI_and_app_Events()
     this.setUpDragAndDrop(this.hostElement, document)
 
-    //load settings
-    if (Settings.get().persistCode) {
-      if (Settings.get().generatedTestCode) {
-        this.codeOutputDiv.innerHTML = '<pre>' + Settings.get().generatedTestCode + '</pre>'
+    //load LocalSettings
+    if (LocalSettings.get().persistCode) {
+      if (LocalSettings.get().generatedTestCode) {
+        this.codeOutputDiv.innerHTML = '<pre>' + LocalSettings.get().generatedTestCode + '</pre>'
       }
     }
     this.updateFontSize()
   }
 
   updateFontSize () {
-    if (Settings.get().codeFontSize) {
-      this.codeOutputDiv.style.fontSize = `${Settings.get().codeFontSize}px`
+    if (LocalSettings.get().codeFontSize) {
+      this.codeOutputDiv.style.fontSize = `${LocalSettings.get().codeFontSize}px`
     } else {
       this.codeOutputDiv.style.fontSize = `${this.defaultFontSizePx}px`
 
@@ -133,7 +134,7 @@ export class TestRecorder {
     document.querySelector('.info').addEventListener('click', () => {
       alert(`Version: ${require('../package.json').version}`)
     })
-    document.querySelector('.settings').addEventListener('click', () => {
+    document.querySelector('.LocalSettings').addEventListener('click', () => {
       let el = document.createElement('div')
 
       // language=HTML
@@ -143,16 +144,20 @@ export class TestRecorder {
         <form>
         <ul>
           <li title="By default only elements with id's or data-test* attributes are recorded">
-            Record all elements<input name="recordAll" type="checkbox" ${Settings.get().recordAll ? "checked" : ""}>
+            Record all elements<input name="recordAll" type="checkbox" ${LocalSettings.get().recordAll ? "checked" : ""}>
           </li>
           <li title="Useful for page refreshes">
-            Persist code<input name="persistCode" type="checkbox" ${Settings.get().persistCode ? "checked" : ""}>
+            Persist code<input name="persistCode" type="checkbox" ${LocalSettings.get().persistCode ? "checked" : ""}>
           </li>
           <li title="Opens on page refreshes">
-            Keep recorder open<input name="keepOpen" type="checkbox" ${Settings.get().keepOpen ? "checked" : ""}>
-          </li>
+            Keep recorder open<input name="keepOpen" type="checkbox" ${LocalSettings.get().keepOpen ? "checked" : ""}>
           <li title="The size of the generated code in pixels">
-            Code size px<input name="codeFontSize" type="number" value="${Settings.get().codeFontSize ? Settings.get().codeFontSize : 10}">
+            Code size px<input name="codeFontSize" type="number" value="${LocalSettings.get().codeFontSize ? LocalSettings.get().codeFontSize : 10}">
+          </li>
+          </li>
+          <li title="Records form values for auto population">
+            Monkey Mode<input name="monkeyMode" type="checkbox" ${LocalSettings.get().monkeyMode ? "checked" : ""}>
+            <button name=clearMonkeyMode>Clear saved values</button>
           </li>
           </ul>
           <button>Save</button>
@@ -164,9 +169,10 @@ export class TestRecorder {
           recordAll: (<HTMLInputElement> el.querySelector('[name="recordAll"]')).checked,
           keepOpen: (<HTMLInputElement> el.querySelector('[name="keepOpen"]')).checked,
           persistCode: (<HTMLInputElement> el.querySelector('[name="persistCode"]')).checked,
+          monkeyMode: (<HTMLInputElement> el.querySelector('[name="monkeyMode"]')).checked,
           codeFontSize: (<HTMLInputElement> el.querySelector('[name="codeFontSize"]')).value
         }
-        Settings.save(settings)
+        settings.save(settings)
 
         // update UI
         this.updateFontSize()
@@ -194,7 +200,7 @@ export class TestRecorder {
     document.querySelector('#framework-choice').addEventListener('change', (event: any) => {
       let newValue = (event.target.options[event.target.selectedIndex]).value
       this.currentCodeGenerator = this.codeGenerators.get(newValue)
-      Settings.saveItem("currentCodeGenerator", this.currentCodeGenerator.description)
+      LocalSettings.saveItem("currentCodeGenerator", this.currentCodeGenerator.description)
     })
 
     /**
@@ -228,6 +234,8 @@ export class TestRecorder {
       let newTestPrint = this.currentCodeGenerator.clickHappened(getPlaybackPath(e.target, e.path))
       this.appendToGeneratedScript(newTestPrint)
       this.awaitMutations()
+
+
     })
 
     document.addEventListener('change', (e: any) => {
@@ -240,7 +248,6 @@ export class TestRecorder {
         let newCode = this.currentCodeGenerator.selectChange(getPlaybackPath(e.target, e.path), e)
         this.appendToGeneratedScript(newCode)
         this.awaitMutations()
-
       }
     })
 
@@ -253,6 +260,11 @@ export class TestRecorder {
         let newCode = this.currentCodeGenerator.inputTextEdited(getPlaybackPath(e.target, e.path), e.target.value)
         this.appendToGeneratedScript(newCode)
         this.awaitMutations()
+
+        // record form values if MonkeyMode is set
+        if(LocalSettings.get().monkeyMode){
+          LocalSettings.saveItem()
+        }
       }
     })
   }
@@ -307,10 +319,10 @@ export class TestRecorder {
   setGeneratedScript (code) {
     this.generatedTestCode = code
     this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
-    if (Settings.get().persistCode) {
-      Settings.saveItem("generatedTestCode", this.generatedTestCode)
+    if (LocalSettings.get().persistCode) {
+      LocalSettings.saveItem("generatedTestCode", this.generatedTestCode)
     } else {
-      Settings.saveItem("generatedTestCode", "")
+      LocalSettings.saveItem("generatedTestCode", "")
     }
   }
 
@@ -318,10 +330,10 @@ export class TestRecorder {
     this.currentUserEvent = userEvent
     this.generatedTestCode += userEvent.playbackCode
     this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
-    if (Settings.get().persistCode) {
-      Settings.saveItem("generatedTestCode", this.generatedTestCode)
+    if (LocalSettings.get().persistCode) {
+      LocalSettings.saveItem("generatedTestCode", this.generatedTestCode)
     } else {
-      Settings.saveItem("generatedTestCode", "")
+      LocalSettings.saveItem("generatedTestCode", "")
     }
 
     //todo get prism to work
@@ -525,9 +537,9 @@ function get_Path_To_Nearest_Class_or_Id (path) {
 
 // open the recorder if user specifies
 var testRecorder: TestRecorder
-if (Settings.get().keepOpen) {
+if (LocalSettings.get().keepOpen) {
   console.log("opening test recorder automatically")
-  console.log(Settings.get())
+  console.log(LocalSettings.get())
   testRecorder = new TestRecorder()
 }
 ``

@@ -1,4 +1,4 @@
-import { Settings } from '../Settings'
+import { LocalSettings } from '../LocalSettings'
 import { Regexes } from '../Regexes'
 import { TestRecorder } from '../TestRecorder'
 
@@ -31,7 +31,7 @@ export default {
       return true
     }
 
-    if (Settings.get().recordAll) {
+    if (LocalSettings.get().recordAll) {
       return true
     }
   },
