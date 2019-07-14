@@ -2,43 +2,63 @@
  * this is the default configuration
  * If you want to override this, pass it in as an argument to the TestRecorder constructor
  */
-enum monkeyModeDataItemType {TextInput, SelectInput, RadioInput}
+enum monkeyModeDataItemType {
+  TextInput,
+  SelectInput,
+  RadioInput
+}
 
-type monkeyModeDataItem = { type: monkeyModeDataItemType, value: any }
+type monkeyModeDataItem = { type: monkeyModeDataItemType; value: any }
 type SettingsObj = {
-  recordAll: boolean,
+  recordAll: boolean
   currentCodeGenerator: string
-  persistCode: boolean,
-  keepOpen: string
+  persistCode: boolean
+  keepOpen: boolean
   generatedTestCode: string
-  codeFontSize: number
+  codeFontSizePx: number
   monkeyMode: boolean
   monkeyModeData: monkeyModeDataItem[]
 }
+const settingsDefaults: Partial<SettingsObj> = {
+  recordAll: false,
+  persistCode: false,
+  keepOpen: false,
+  codeFontSizePx: 12
+  //monkeyMode: boolean
+  //monkeyModeData: monkeyModeDataItem[]
+}
 
- class LocalSettings {
-
+class LocalSettings {
   private settings: SettingsObj
+  private LOCAL_SETTINGS = "test-recorder-settings"
 
+  /**
+   * loads json into the settings object then reads that in the app
+   */
   constructor() {
-    this.settings = JSON.parse(localStorage.getItem('LocalSettings'))
-
+    //check if settings exist if not init with default values
+    this.settings = JSON.parse(localStorage.getItem(this.LOCAL_SETTINGS))
+    if (!this.settings) {
+      this.save(settingsDefaults)
+    }
     // init some data to sensible values
-    if (this.settings.monkeyModeData) {
+    /*    if (this.settings.monkeyModeData) {
       this.settings.monkeyModeData = []
       this.save(this.settings)
-    }
-
+    }*/
   }
 
-  private save(settings: SettingsObj) {
-    localStorage.setItem('LocalSettings', JSON.stringify(settings))
+  private save(settings: Partial<SettingsObj>) {
+    localStorage.setItem(this.LOCAL_SETTINGS, JSON.stringify(settings))
   }
 
   saveItem(key: string, data: any) {
     let currentData = this.get()
     currentData[key] = data
     this.save(currentData)
+  }
+  saveAll(data: any) {
+    this.save(data)
   }
 
   get(): SettingsObj {

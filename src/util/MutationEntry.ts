@@ -1,5 +1,3 @@
 export class MutationEntry {
-  constructor (public path: string, public generatedCode: string) {
-
-  }
+  constructor(public path: string, public generatedCode: string) {}
 }

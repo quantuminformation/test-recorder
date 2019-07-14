@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/QuantumInformation/test-recorder.svg?branch=master)](https://travis-ci.org/QuantumInformation/test-recorder)
-
 # Sponsors
 If you would like to be an official supporter of this project, please contact me, and I will place your logo here!
 # Donations

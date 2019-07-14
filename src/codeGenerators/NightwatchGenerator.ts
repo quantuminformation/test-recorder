@@ -1,18 +1,18 @@
-import formattingRules from '../util/formattingRules'
-import { TestRecorder } from '../TestRecorder'
-import { ICodeGenerator } from './ICodeGenerator'
-import { MutationEntry } from '../util/MutationEntry'
-import { UserEvent } from '../util/UserEvent'
+import formattingRules from "../util/formattingRules"
+import { TestRecorder } from "../TestRecorder"
+import { ICodeGenerator } from "./ICodeGenerator"
+import { MutationEntry } from "../util/MutationEntry"
+import { UserEvent } from "../util/UserEvent"
 
 export class NightwatchGenerator implements ICodeGenerator {
-  lastRoute: string = ''
-  description: string = 'NightWatch'
+  lastRoute: string = ""
+  description: string = "NightWatch"
 
-  constructor () {
+  constructor() {
     // tslint:disable-line
   }
 
-  selectChange (queryPath, event: Event): UserEvent {
+  selectChange(queryPath, event: Event): UserEvent {
     let target = event.target as HTMLSelectElement
     let newSelectedIndex = target.selectedIndex
     let newValue = (target.options[newSelectedIndex] as HTMLOptionElement).value
@@ -25,17 +25,18 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
 
-  clickHappened (queryPath: string): UserEvent {
-    return new UserEvent(`
+  clickHappened(queryPath: string): UserEvent {
+    return new UserEvent(
+      `
 .click('${queryPath}')
 `,
       `${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
 
-  inputTextEdited (queryPath, newValue): UserEvent {
-
-    return new UserEvent(`
+  inputTextEdited(queryPath, newValue): UserEvent {
+    return new UserEvent(
+      `
 browser.setValue('${queryPath}', '${newValue}')
 `,
       `browser.pause(500)
@@ -43,17 +44,19 @@ ${TestRecorder.MUTATIONS_PLACEHOLDER}`
     )
   }
 
-  elementAdded (queryPath: string): MutationEntry {
+  elementAdded(queryPath: string): MutationEntry {
     return new MutationEntry(`${queryPath}`, `.waitForElementPresent('${queryPath}', 1000)`)
   }
 
-  elementRemoved (queryPath: string): MutationEntry {
+  elementRemoved(queryPath: string): MutationEntry {
     return new MutationEntry(`${queryPath}`, `.waitForElementNotPresent('${queryPath}', 1000)`)
   }
 
-  characterDataChanged (record: MutationRecord): MutationEntry {
+  characterDataChanged(record: MutationRecord): MutationEntry {
     let el = record.target as HTMLElement
-    return new MutationEntry(`#${el.parentElement.id}`, `.assert.containsText('#${el.parentElement.id}','${el.nodeValue}')`)
+    return new MutationEntry(
+      `#${el.parentElement.id}`,
+      `.assert.containsText('#${el.parentElement.id}','${el.nodeValue}')`
+    )
   }
-
 }
