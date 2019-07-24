@@ -31,7 +31,7 @@
     "awesome-typescript-loader": "^5.2.1",
     "babel-core": "^6.26.3",
     "babili-webpack-plugin": "0.1.2",
-    "css-loader": "^3.0.0",
+    "css-loader": "^3.1.0",
     "css-variables": "^0.1.7",
     "html-webpack-plugin": "^3.2.0",
     "postcss-calc": "^7.0.1",
@@ -45,13 +45,13 @@
     "ts-loader": "^6.0.4",
     "typescript": "^3.5.3",
     "vanilla-typescript": "^0.4.10",
-    "webpack": "4.35.3",
+    "webpack": "4.36.1",
     "webpack-build-notifier": "^1.0.3",
     "webpack-merge": "^4.2.1",
     "prettier": "^1.18.2"
   },
   "pre-commit": "test",
   "dependencies": {
-    "solar-popup": "^0.4.13"
+    "solar-popup": "^0.5.0"
   }
 }

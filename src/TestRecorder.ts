@@ -9,7 +9,7 @@ import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator"
 import { CypressGenerator } from "./codeGenerators/Chromeless"
 import { MutationEntry } from "./util/MutationEntry"
 import { UserEvent } from "./util/UserEvent"
-import SolarPopup from "solar-popup"
+import { SolarPopup } from "solar-popup"
 import { localSettings } from "./LocalSettings"
 import PathTools, { getPath, isElementClassOrChildOfClass } from "./util/PathTools"
 
@@ -21,14 +21,9 @@ declare let require
  * Default tests that are generated are for Nightwatch
  */
 export class TestRecorder {
-  // defaults
-  defaultFontSizePx: number = 8
-
   codeGenerators: Map<string, ICodeGenerator>
-
   currentCodeGenerator: ICodeGenerator
   currentUserEvent: UserEvent
-
   mutationObserversArr: MutationObserver[] = []
   generatedTestCode: string = "" //this is sent to what ever wants to receive generated code
 
@@ -47,8 +42,6 @@ export class TestRecorder {
    * @param config you can override this
    */
   constructor() {
-
-    console.log(localSettings.get())
     let nightwatchGenerator = new NightwatchGenerator()
     let emberCLIGenerator = new EmberCLIGenerator()
     let cypressGenerator = new CypressGenerator()
@@ -110,14 +103,11 @@ export class TestRecorder {
       }
     }
     this.updateFontSize()
+    console.log('Test recorder setup successfully')
   }
 
   updateFontSize() {
-    if (localSettings.get().codeFontSizePx) {
-      this.codeOutputDiv.style.fontSize = `${localSettings.get().codeFontSizePx}px`
-    } else {
-      this.codeOutputDiv.style.fontSize = `${this.defaultFontSizePx}px`
-    }
+    this.codeOutputDiv.style.fontSize = `${localSettings.get().codeFontSizePx}px`
   }
 
   destroy() {
@@ -182,7 +172,7 @@ export class TestRecorder {
           recordAll: (<HTMLInputElement>el.querySelector('[name="recordAll"]')).checked,
           keepOpen: (<HTMLInputElement>el.querySelector('[name="keepOpen"]')).checked,
           persistCode: (<HTMLInputElement>el.querySelector('[name="persistCode"]')).checked,
-          monkeyMode: (<HTMLInputElement>el.querySelector('[name="monkeyMode"]')).checked,
+     //     monkeyMode: (<HTMLInputElement>el.querySelector('[name="monkeyMode"]')).checked,
           codeFontSize: (<HTMLInputElement>el.querySelector('[name="codeFontSize"]')).value
         }
         localSettings.saveAll(settings)
@@ -193,9 +183,10 @@ export class TestRecorder {
       let popup = new SolarPopup(el)
       popup.hostElement.classList.add(TestRecorder.DO_NOT_RECORD)
       popup.show()
+      document.querySelector('.modal-background').classList.add(TestRecorder.DO_NOT_RECORD)
     })
     document.querySelector(".minimise").addEventListener("click", () => {
-      this.hostElement.style.height = "30px"
+      this.hostElement.style.height = "40px"
     })
     document.querySelector(".resize").addEventListener("click", () => {
       this.hostElement.style.height = "300px"
@@ -280,7 +271,7 @@ export class TestRecorder {
         this.awaitMutations()
 
         // record form values if MonkeyMode is set
-    /*    if (localSettings.get().monkeyMode) {
+        /*    if (localSettings.get().monkeyMode) {
           localSettings.saveAll()
         }*/
       }
@@ -579,7 +570,6 @@ function get_Path_To_Nearest_Class_or_Id(path) {
 // open the recorder if user specifies
 var testRecorder: TestRecorder
 if (localSettings.get().keepOpen) {
-  console.log("opening test recorder automatically")
   console.log(localSettings.get())
   testRecorder = new TestRecorder()
 }

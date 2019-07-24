@@ -15,7 +15,7 @@ expected (happy flow) as then you will have the tests generated for this. You ca
 
 # Chrome extension
 The Test Recorder has now been made into a [Chrome extension](https://chrome.google.com/webstore/detail/test-recorder/mehbmedddkpilcbbjcichiopegameghh) which makes it real easy for anyone to start recording tests in the browser. I include how it works in this video: as I bonus I also include my pastime of Skiing in London.
-
+    
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=HhJFD3jr0oo
 " target="_blank"><img src="http://img.youtube.com/vi/HhJFD3jr0oo/0.jpg" 
 alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>

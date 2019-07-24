@@ -23,13 +23,13 @@ const settingsDefaults: Partial<SettingsObj> = {
   recordAll: false,
   persistCode: false,
   keepOpen: false,
-  codeFontSizePx: 12
+  codeFontSizePx: 10
   //monkeyMode: boolean
   //monkeyModeData: monkeyModeDataItem[]
 }
 
 class LocalSettings {
-  private settings: SettingsObj
+  private settings: Partial<SettingsObj>
   private LOCAL_SETTINGS = "test-recorder-settings"
 
   /**
@@ -41,15 +41,13 @@ class LocalSettings {
     if (!this.settings) {
       this.save(settingsDefaults)
     }
-    // init some data to sensible values
-    /*    if (this.settings.monkeyModeData) {
-      this.settings.monkeyModeData = []
-      this.save(this.settings)
-    }*/
+    console.log(this.settings)
   }
 
   private save(settings: Partial<SettingsObj>) {
     localStorage.setItem(this.LOCAL_SETTINGS, JSON.stringify(settings))
+    this.settings = settings
+    console.log(`new settings value saved: ${this.settings}`)
   }
 
   saveItem(key: string, data: any) {
@@ -61,7 +59,7 @@ class LocalSettings {
     this.save(data)
   }
 
-  get(): SettingsObj {
+  get(): Partial<SettingsObj> {
     return this.settings
   }
 }
