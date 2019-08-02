@@ -4,7 +4,5 @@
  *
  */
 export class UserEvent {
-  constructor (public playbackCode: string, public mutationCode: string) {
-
-  }
+  constructor(public playbackCode: string, public mutationCode: string) {}
 }

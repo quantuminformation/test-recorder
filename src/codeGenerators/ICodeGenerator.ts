@@ -1,5 +1,5 @@
-import { MutationEntry } from '../util/MutationEntry'
-import { UserEvent } from '../util/UserEvent'
+import { MutationEntry } from "../util/MutationEntry"
+import { UserEvent } from "../util/UserEvent"
 export interface ICodeGenerator {
   description: string
 

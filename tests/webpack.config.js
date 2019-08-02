@@ -6,7 +6,7 @@ var HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const PATHS = {
   src: path.join(__dirname, './src'),
-  build: path.join(__dirname, './build')
+  build: path.join(__dirname, './dist')
 };
 
 module.exports = {
@@ -17,6 +17,11 @@ module.exports = {
   output: {
     path: PATHS.build,
     filename: '[name].js',
+  },
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    compress: true,
+    port: 9000
   },
   devtool: "source-map",
   module: {

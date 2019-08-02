@@ -1,17 +1,18 @@
 //todo perhaps use typescript to have these as interface implementation
-import { NightwatchGenerator } from './codeGenerators/NightwatchGenerator'
-import './styles/app.pcss'
-import { copyTextToClipboard } from './util/clipboard'
+import { NightwatchGenerator } from "./codeGenerators/NightwatchGenerator"
+import "./styles/app.pcss"
+import { copyTextToClipboard } from "./util/clipboard"
 //import  'prismjs'
 //import  'prismjs/components/prism-javascript'
-import { ICodeGenerator } from './codeGenerators/ICodeGenerator'
+import { ICodeGenerator } from "./codeGenerators/ICodeGenerator"
 import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator"
-import { ChromelessGenerator } from "./codeGenerators/Chromeless"
+import { CypressGenerator } from "./codeGenerators/Cypress"
 import { MutationEntry } from "./util/MutationEntry"
 import { UserEvent } from "./util/UserEvent"
-import SolarPopup from 'solar-popup'
-import { Settings } from "./Settings"
+import { SolarPopup } from "solar-popup"
+import { localSettings } from "./LocalSettings"
 import PathTools, { getPath, isElementClassOrChildOfClass } from "./util/PathTools"
+import { SettingsPopup } from "./components/SettingsPopup"
 
 declare let require
 
@@ -21,65 +22,64 @@ declare let require
  * Default tests that are generated are for Nightwatch
  */
 export class TestRecorder {
-
-  // defaults
-  defaultFontSizePx: number = 8
-
   codeGenerators: Map<string, ICodeGenerator>
-
   currentCodeGenerator: ICodeGenerator
   currentUserEvent: UserEvent
-
   mutationObserversArr: MutationObserver[] = []
-  generatedTestCode: string = '' //this is sent to what ever wants to receive generated code
+  generatedTestCode: string = "" //this is sent to what ever wants to receive generated code
 
   //todo think about refactor
   //userEvents: UserEvent[] = []
 
-  lastRoute: ''
+  lastRoute: ""
   cachedMutations: MutationEntry[] = [] //this stores the changes made from mutations until we want to insert them into the generated code
   hostElement: HTMLElement
   codeOutputDiv: HTMLElement
 
-  static MUTATIONS_PLACEHOLDER = '[MUTATIONS_PLACEHOLDER]'
-  static DO_NOT_RECORD = 'doNotRecord'
+  static MUTATIONS_PLACEHOLDER = "[MUTATIONS_PLACEHOLDER]"
+  static DO_NOT_RECORD = "doNotRecord"
 
   /**
    * @param config you can override this
    */
-  constructor () {
+  constructor() {
     let nightwatchGenerator = new NightwatchGenerator()
     let emberCLIGenerator = new EmberCLIGenerator()
-    let chromelessGenerator = new ChromelessGenerator()
+    let cypressGenerator = new CypressGenerator()
     this.codeGenerators = new Map([
       [emberCLIGenerator.description, emberCLIGenerator],
       [nightwatchGenerator.description, nightwatchGenerator],
-      [chromelessGenerator.description, chromelessGenerator]
+      [cypressGenerator.description, cypressGenerator]
     ])
 
-    let rootDomNode = document.querySelector('body')
-    let ui = document.createElement('div')
+    let rootDomNode = document.querySelector("body")
+    let ui = document.createElement("div")
 
-    //apply settings
-    if (Settings.get().currentCodeGenerator) {
-      this.currentCodeGenerator = this.codeGenerators.get(Settings.get().currentCodeGenerator)
+    //apply LocalSettings
+    if (localSettings.get().currentCodeGenerator) {
+      this.currentCodeGenerator = this.codeGenerators.get(localSettings.get().currentCodeGenerator)
     }
     if (!this.currentCodeGenerator) {
       this.currentCodeGenerator = this.codeGenerators.values().next().value
     }
 
     // language=HTML
-    ui.innerHTML =
-      `<div id="testRecorderUI" class="${TestRecorder.DO_NOT_RECORD}" draggable=true>
+    ui.innerHTML = `<div id="testRecorderUI" class="${TestRecorder.DO_NOT_RECORD}" draggable=true>
           <div class="header">
           <span id="clear" >&#x1F6AB;</span>
           <span id="debug">&#x1F41B;</span>
           <button id="copy">Copy</button>
            <span class="info" >&#x1F3F7;</span>
-          <span class="settings" >&#x2699;</span>
+          <span class="settingsTR" >&#x2699;</span>
           <select id="framework-choice">
-            ${Array.from(this.codeGenerators.keys()).map(item =>
-        `<option value="${item}" ${item === this.currentCodeGenerator.description ? "selected" : ""}>${item}</option>`).join('')}
+            ${Array.from(this.codeGenerators.keys())
+              .map(
+                item =>
+                  `<option value="${item}" ${
+                    item === this.currentCodeGenerator.description ? "selected" : ""
+                  }>${item}</option>`
+              )
+              .join("")}
           </select>
           <span class="minimise" >_</span>
           <span class="resize" >&#x1F5D6;</span>
@@ -90,32 +90,28 @@ export class TestRecorder {
 
     document.body.appendChild(ui.firstChild)
 
-    this.hostElement = document.getElementById('testRecorderUI')
-    this.codeOutputDiv = document.getElementById('generatedScript')
+    this.hostElement = document.getElementById("testRecorderUI")
+    this.codeOutputDiv = document.getElementById("generatedScript")
     //this will iterate through this node and watch for changes and store them until we want to display them
     this.addObserverForTarget(rootDomNode)
     this.setupTestRecorderUI_and_app_Events()
     this.setUpDragAndDrop(this.hostElement, document)
 
-    //load settings
-    if (Settings.get().persistCode) {
-      if (Settings.get().generatedTestCode) {
-        this.codeOutputDiv.innerHTML = '<pre>' + Settings.get().generatedTestCode + '</pre>'
+    //load LocalSettings
+    if (localSettings.get().persistCode) {
+      if (localSettings.get().generatedTestCode) {
+        this.codeOutputDiv.innerHTML = "<pre>" + localSettings.get().generatedTestCode + "</pre>"
       }
     }
     this.updateFontSize()
+    console.log("Test recorder setup successfully")
   }
 
-  updateFontSize () {
-    if (Settings.get().codeFontSize) {
-      this.codeOutputDiv.style.fontSize = `${Settings.get().codeFontSize}px`
-    } else {
-      this.codeOutputDiv.style.fontSize = `${this.defaultFontSizePx}px`
-
-    }
+  updateFontSize() {
+    this.codeOutputDiv.style.fontSize = `${localSettings.get().codeFontSizePx}px`
   }
 
-  destroy () {
+  destroy() {
     console.log("removing test recorder")
     this.hostElement.parentElement.removeChild(this.hostElement)
     //todo remove listeners
@@ -124,77 +120,39 @@ export class TestRecorder {
   /**
    * listen to events of various type bubbling up to the document
    */
-  setupTestRecorderUI_and_app_Events () {
-
+  setupTestRecorderUI_and_app_Events() {
     //test recorder UI--------------------------------------------------------------------
-    document.querySelector('#copy').addEventListener('click', () => {
+    document.querySelector("#copy").addEventListener("click", () => {
       copyTextToClipboard(this.codeOutputDiv.textContent)
     })
-    document.querySelector('.info').addEventListener('click', () => {
-      alert(`Version: ${require('../package.json').version}`)
+    document.querySelector(".info").addEventListener("click", () => {
+      alert(`Version: ${require("../package.json").version}`)
     })
-    document.querySelector('.settings').addEventListener('click', () => {
-      let el = document.createElement('div')
+    document.querySelector(".settingsTR").addEventListener("click", () => {
+      let el = document.createElement("div")
 
-      // language=HTML
-      el.innerHTML = `
-        <h3>Test Recorder settings</h3>
-        <p>This stores the settings in your local storage for the current web URL</p>
-        <form>
-        <ul>
-          <li title="By default only elements with id's or data-test* attributes are recorded">
-            Record all elements<input name="recordAll" type="checkbox" ${Settings.get().recordAll ? "checked" : ""}>
-          </li>
-          <li title="Useful for page refreshes">
-            Persist code<input name="persistCode" type="checkbox" ${Settings.get().persistCode ? "checked" : ""}>
-          </li>
-          <li title="Opens on page refreshes">
-            Keep recorder open<input name="keepOpen" type="checkbox" ${Settings.get().keepOpen ? "checked" : ""}>
-          </li>
-          <li title="The size of the generated code in pixels">
-            Code size px<input name="codeFontSize" type="number" value="${Settings.get().codeFontSize ? Settings.get().codeFontSize : 10}">
-          </li>
-          </ul>
-          <button>Save</button>
-        </form>
-      `
+      let settingsPopup = new SettingsPopup(this.updateFontSize)
+      settingsPopup.show()
 
-      el.addEventListener('submit', (e) => {
-        let settings = {
-          recordAll: (<HTMLInputElement> el.querySelector('[name="recordAll"]')).checked,
-          keepOpen: (<HTMLInputElement> el.querySelector('[name="keepOpen"]')).checked,
-          persistCode: (<HTMLInputElement> el.querySelector('[name="persistCode"]')).checked,
-          codeFontSize: (<HTMLInputElement> el.querySelector('[name="codeFontSize"]')).value
-        }
-        Settings.save(settings)
-
-        // update UI
-        this.updateFontSize()
-      })
-      let popup = new SolarPopup(el)
-      popup.hostElement.classList.add(TestRecorder.DO_NOT_RECORD)
-      popup.show()
-
+      document.querySelector(".modal-background").classList.add(TestRecorder.DO_NOT_RECORD)
     })
-    document.querySelector('.minimise').addEventListener('click', () => {
-      this.hostElement.style.height = "30px"
-
+    document.querySelector(".minimise").addEventListener("click", () => {
+      this.hostElement.style.height = "40px"
     })
-    document.querySelector('.resize').addEventListener('click', () => {
+    document.querySelector(".resize").addEventListener("click", () => {
       this.hostElement.style.height = "300px"
-
     })
-    document.querySelector('#debug').addEventListener('click', () => {
+    document.querySelector("#debug").addEventListener("click", () => {
       console.log(this.cachedMutations)
       console.log(this)
     })
-    document.querySelector('#clear').addEventListener('click', () => {
+    document.querySelector("#clear").addEventListener("click", () => {
       this.setGeneratedScript("")
     })
-    document.querySelector('#framework-choice').addEventListener('change', (event: any) => {
-      let newValue = (event.target.options[event.target.selectedIndex]).value
+    document.querySelector("#framework-choice").addEventListener("change", (event: any) => {
+      let newValue = event.target.options[event.target.selectedIndex].value
       this.currentCodeGenerator = this.codeGenerators.get(newValue)
-      Settings.saveItem("currentCodeGenerator", this.currentCodeGenerator.description)
+      localSettings.saveItem("currentCodeGenerator", this.currentCodeGenerator.description)
     })
 
     /**
@@ -202,10 +160,11 @@ export class TestRecorder {
      * @param e
      * @returns {boolean}
      */
-    function filterEvent (path: any): boolean {
+    function filterEvent(path: any): boolean {
       path = getPathUpTillBody(path)
 
-      if (!path || path.length === 0) { // eg clicking outside the body if the app is less than the height of the window
+      if (!path || path.length === 0) {
+        // eg clicking outside the body if the app is less than the height of the window
         return false
       }
       if (isAnyElementInPathClassOrChildOfClass(path, TestRecorder.DO_NOT_RECORD)) {
@@ -214,14 +173,17 @@ export class TestRecorder {
       return true
     }
 
-    document.addEventListener('click', (e: any) => {
+    document.addEventListener("click", (e: any) => {
       if (!filterEvent(e.path)) {
         return
       }
 
-      if (e.target.localName === 'input' && e.target.type === 'text' || //on listen to focus-out for these
-        e.target.localName === 'html' ||  // don't want to record clicking outside the app'
-        e.target.type === 'select-one') { // selects handled elsewhere
+      if (
+        (e.target.localName === "input" && e.target.type === "text") || //on listen to focus-out for these
+        e.target.localName === "html" || // don't want to record clicking outside the app'
+        e.target.type === "select-one"
+      ) {
+        // selects handled elsewhere
         return
       }
 
@@ -230,61 +192,76 @@ export class TestRecorder {
       this.awaitMutations()
     })
 
-    document.addEventListener('change', (e: any) => {
+    document.addEventListener("change", (e: any) => {
       if (!filterEvent(e.path)) {
         return
       }
 
       //setsUpSelect input watching
-      if (e.target.localName === 'select') {
+      if (e.target.localName === "select") {
         let newCode = this.currentCodeGenerator.selectChange(getPlaybackPath(e.target, e.path), e)
         this.appendToGeneratedScript(newCode)
         this.awaitMutations()
-
       }
     })
 
-    document.addEventListener('focusout', (e: any) => {
+    document.addEventListener("focusout", (e: any) => {
       if (!filterEvent(e.path)) {
         return
       }
 
-      if (e.target.tagName === 'INPUT' && (e.target.type === 'text' || e.target.type === 'textArea')) {
-        let newCode = this.currentCodeGenerator.inputTextEdited(getPlaybackPath(e.target, e.path), e.target.value)
+      if (
+        e.target.tagName === "INPUT" &&
+        (e.target.type === "text" || e.target.type === "textArea")
+      ) {
+        let newCode = this.currentCodeGenerator.inputTextEdited(
+          getPlaybackPath(e.target, e.path),
+          e.target.value
+        )
         this.appendToGeneratedScript(newCode)
         this.awaitMutations()
+
+        // record form values if MonkeyMode is set
+        /*    if (localSettings.get().monkeyMode) {
+          localSettings.saveAll()
+        }*/
       }
     })
   }
 
-  setUpDragAndDrop (source, target) {
-    let testRecorderDragstart = (ev) => {
+  setUpDragAndDrop(source, target) {
+    let testRecorderDragstart = ev => {
       let style = window.getComputedStyle(ev.target, null)
-      target.addEventListener('dragover', testRecorderDragover)
-      target.addEventListener('drop', testRecorderDrop)
-      ev.dataTransfer.setData('text/plain', `${(parseInt(style.getPropertyValue('left'), 10) - ev.clientX)}, ${(parseInt(style.getPropertyValue('top'), 10) - ev.clientY)}`)
+      target.addEventListener("dragover", testRecorderDragover)
+      target.addEventListener("drop", testRecorderDrop)
+      ev.dataTransfer.setData(
+        "text/plain",
+        `${parseInt(style.getPropertyValue("left"), 10) - ev.clientX}, ${parseInt(
+          style.getPropertyValue("top"),
+          10
+        ) - ev.clientY}`
+      )
     }
-    let testRecorderDragover = (ev) => {
-      source.style.visibility = 'hidden'
+    let testRecorderDragover = ev => {
+      source.style.visibility = "hidden"
       ev.preventDefault()
     }
-    let testRecorderDrop = (ev) => {
-      let offset = ev.dataTransfer.getData('text/plain').split(',')
-      source.style.left = (ev.clientX + parseInt(offset[0], 10)) + 'px'
-      source.style.top = (ev.clientY + parseInt(offset[1], 10)) + 'px'
+    let testRecorderDrop = ev => {
+      let offset = ev.dataTransfer.getData("text/plain").split(",")
+      source.style.left = ev.clientX + parseInt(offset[0], 10) + "px"
+      source.style.top = ev.clientY + parseInt(offset[1], 10) + "px"
       event.preventDefault()
     }
-    let testRecorderDragend = (ev) => {
-      source.style.visibility = 'visible'
-      target.removeEventListener('dragover', testRecorderDragover)
-      target.removeEventListener('drop', testRecorderDrop)
+    let testRecorderDragend = ev => {
+      source.style.visibility = "visible"
+      target.removeEventListener("dragover", testRecorderDragover)
+      target.removeEventListener("drop", testRecorderDrop)
     }
-    source.addEventListener('dragstart', testRecorderDragstart)
-    source.addEventListener('dragend', testRecorderDragend)
+    source.addEventListener("dragstart", testRecorderDragstart)
+    source.addEventListener("dragend", testRecorderDragend)
   }
 
-  insertMutationsToGeneratedScript () {
-
+  insertMutationsToGeneratedScript() {
     //don't add the assertino code if we didn't find any mutations of interest
     if (!this.cachedMutations.length) {
       return
@@ -298,34 +275,35 @@ export class TestRecorder {
     this.cachedMutations = (Object as any).values(lastUniqueItems)
 
     let final = this.cachedMutations.map((item: MutationEntry) => item.generatedCode).join("<br>")
-    let newCode = this.currentUserEvent.mutationCode.replace(TestRecorder.MUTATIONS_PLACEHOLDER, final)
+    let newCode = this.currentUserEvent.mutationCode.replace(
+      TestRecorder.MUTATIONS_PLACEHOLDER,
+      final
+    )
     this.generatedTestCode += newCode
     this.setGeneratedScript(this.generatedTestCode)
     this.cachedMutations = []
   }
 
-  setGeneratedScript (code) {
+  setGeneratedScript(code) {
     this.generatedTestCode = code
-    this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
-    if (Settings.get().persistCode) {
-      Settings.saveItem("generatedTestCode", this.generatedTestCode)
+    this.codeOutputDiv.innerHTML = "<pre>" + this.generatedTestCode + "</pre>"
+    if (localSettings.get().persistCode) {
+      localSettings.saveItem("generatedTestCode", this.generatedTestCode)
     } else {
-      Settings.saveItem("generatedTestCode", "")
+      localSettings.saveItem("generatedTestCode", "")
     }
   }
 
-  appendToGeneratedScript (userEvent: UserEvent) {
+  appendToGeneratedScript(userEvent: UserEvent) {
     this.currentUserEvent = userEvent
     this.generatedTestCode += userEvent.playbackCode
-    this.codeOutputDiv.innerHTML = '<pre>' + this.generatedTestCode + '</pre>'
-    if (Settings.get().persistCode) {
-      Settings.saveItem("generatedTestCode", this.generatedTestCode)
+    this.codeOutputDiv.innerHTML = "<pre>" + this.generatedTestCode + "</pre>"
+    if (localSettings.get().persistCode) {
+      localSettings.saveItem("generatedTestCode", this.generatedTestCode)
     } else {
-      Settings.saveItem("generatedTestCode", "")
+      localSettings.saveItem("generatedTestCode", "")
     }
 
-    //todo get prism to work
-    // Prism.highlightAll()
   }
 
   /*  window.addEventListener("hashchange", function (e) {
@@ -334,7 +312,7 @@ export class TestRecorder {
    })
    */
 
-// todo figure out how to assert route changes for different frameworks
+  // todo figure out how to assert route changes for different frameworks
 
   // just examine history changes for now
 
@@ -352,13 +330,16 @@ export class TestRecorder {
    * todo Use performance api
    * todo possibly use framework specific hooks to decide when operations finished, ie ember promises for routes
    */
-  awaitMutations () {
-    setTimeout(function () {
-      this.insertMutationsToGeneratedScript()
-    }.bind(this), 500)
+  awaitMutations() {
+    setTimeout(
+      function() {
+        this.insertMutationsToGeneratedScript()
+      }.bind(this),
+      500
+    )
   }
 
-  childListMutation (mutationRecord: MutationRecord) {
+  childListMutation(mutationRecord: MutationRecord) {
     let addedNodesMutationEntries: MutationEntry[] = []
     let removedNodesMutationEntries: MutationEntry[] = []
 
@@ -377,48 +358,52 @@ export class TestRecorder {
 
     // mutations should be mutually exclusive?
     if (addedNodesArray.length && removedNodesArray.length) {
-      console.log('strange, both added and removed, investigate')
+      console.log("strange, both added and removed, investigate")
       return
     }
 
-    addedNodesArray.forEach((node) => {
+    addedNodesArray.forEach(node => {
       let selector = getPlaybackPath(node, getPath(node))
       addedNodesMutationEntries.push(this.currentCodeGenerator.elementAdded(selector))
     })
 
-    removedNodesArray.forEach((node) => {
+    removedNodesArray.forEach(node => {
       let selector = getPlaybackPath(node, getPath(node))
       removedNodesMutationEntries.push(this.currentCodeGenerator.elementRemoved(selector))
     })
 
     // this sends this new changes back
-    this.cachedMutations = this.cachedMutations.concat(addedNodesMutationEntries.length ? addedNodesMutationEntries : removedNodesMutationEntries)
+    this.cachedMutations = this.cachedMutations.concat(
+      addedNodesMutationEntries.length ? addedNodesMutationEntries : removedNodesMutationEntries
+    )
   }
 
   /**
    * this is the heart ond soul of the assertions
    */
-  addObserverForTarget (target: HTMLElement) {
-    let observer = new MutationObserver((mutations) => {
+  addObserverForTarget(target: HTMLElement) {
+    let observer = new MutationObserver(mutations => {
       mutations.forEach((mutationRecord: MutationRecord) => {
-
         switch (mutationRecord.type) {
-          case 'characterData':
+          case "characterData":
             let target = mutationRecord.target as HTMLElement
 
-            if (!target.parentElement.id ||
-              isElementClassOrChildOfClass(target, TestRecorder.DO_NOT_RECORD)) {
+            if (
+              !target.parentElement.id ||
+              isElementClassOrChildOfClass(target, TestRecorder.DO_NOT_RECORD)
+            ) {
               return
             }
-            this.cachedMutations.push(this.currentCodeGenerator.characterDataChanged(mutationRecord))
+            this.cachedMutations.push(
+              this.currentCodeGenerator.characterDataChanged(mutationRecord)
+            )
             return
-          case 'childList':
+          case "childList":
             this.childListMutation(mutationRecord)
             return
           default:
             console.log(`discarding mutation of type ${mutationRecord.type}`)
         }
-
       })
     })
     let config = { attributes: true, childList: true, characterData: true, subtree: true }
@@ -427,7 +412,6 @@ export class TestRecorder {
     observer.observe(target, config)
     console.log(target)
     this.mutationObserversArr.push(observer)
-
   }
 }
 
@@ -437,34 +421,36 @@ export class TestRecorder {
  * @param element
  * @returns {number}
  */
-function findNthChildIndex (element: HTMLElement) {
+function findNthChildIndex(element: HTMLElement) {
   let parent: HTMLElement | Node = element.parentNode
   if (!parent) {
     return -1
   }
-  let children = (parent instanceof HTMLElement) ? parent.children : parent.childNodes
+  let children = parent instanceof HTMLElement ? parent.children : parent.childNodes
 
-  let hasOthers = [].some.call(children, function (elem) {
+  let hasOthers = [].some.call(children, function(elem) {
     return elem.tagName === element.tagName && elem !== element
   })
   if (!hasOthers) {
     return -1
   }
-  return Array.from(children).indexOf(element) + 1//because nth child is 1 indexed
+  return Array.from(children).indexOf(element) + 1 //because nth child is 1 indexed
 }
 
 /**
  *
  * @param e event from the DOM that we want to workout the testing path.
  */
-function getPlaybackPath (element: HTMLElement, path: HTMLElement[]) {
-
+function getPlaybackPath(element: HTMLElement, path: HTMLElement[]) {
   let testHelper: string
   for (var i in element.dataset) {
     if (i.match(/^test*/)) {
       //convert something like testFoo to data-test-foo
-      testHelper = `data-${i}`.replace(/([A-Z])/g, "-$1").replace(/^-/, '').toLowerCase()
-      if(element.dataset[i]){
+      testHelper = `data-${i}`
+        .replace(/([A-Z])/g, "-$1")
+        .replace(/^-/, "")
+        .toLowerCase()
+      if (element.dataset[i]) {
         testHelper += `="${element.dataset[i]}"`
       }
       break
@@ -473,27 +459,34 @@ function getPlaybackPath (element: HTMLElement, path: HTMLElement[]) {
 
   if (testHelper) {
     return `[${testHelper}]`
-  }
-  else if (element.id) {
-    return '#' + element.id
+  } else if (element.id) {
+    return "#" + element.id
   } else {
     let newPath = getPathUpTillBody(path)
     newPath = get_Path_To_Nearest_Class_or_Id(newPath).reverse()
 
-    let fullPath = newPath.map(function (element: HTMLElement) {
-      // we need to make each path segment more specific if other siblings of the same type exist
-      let index = findNthChildIndex(element)
-      let idPart = element.id ? `#${element.id}` : ""
+    let fullPath = newPath
+      .map(function(element: HTMLElement) {
+        // we need to make each path segment more specific if other siblings of the same type exist
+        let index = findNthChildIndex(element)
+        let idPart = element.id ? `#${element.id}` : ""
 
-      let classPart = element.className ? `.${Array.from(element.classList).map(className => className).join('.')}` : ""
-      return element.localName + idPart + classPart + (index !== -1 ? ':nth-child(' + index + ')' : '')
-    }).join('>')// join all the segments for the query selector
+        let classPart = element.className
+          ? `.${Array.from(element.classList)
+              .map(className => className)
+              .join(".")}`
+          : ""
+        return (
+          element.localName + idPart + classPart + (index !== -1 ? ":nth-child(" + index + ")" : "")
+        )
+      })
+      .join(">") // join all the segments for the query selector
     console.log(fullPath)
     return fullPath
   }
 }
 
-function isAnyElementInPathClassOrChildOfClass (path: HTMLElement[], className) {
+function isAnyElementInPathClassOrChildOfClass(path: HTMLElement[], className) {
   for (let i = 0; i < path.length; i++) {
     if (Array.from(path[i].classList).indexOf(className) !== -1) {
       return true
@@ -502,17 +495,17 @@ function isAnyElementInPathClassOrChildOfClass (path: HTMLElement[], className) 
   return false
 }
 
-function getPathUpTillBody (path) {
+function getPathUpTillBody(path) {
   // `get index of body, ignore window , document shadow etc
   let length = path.length
   for (let i = 0; i < length; i++) {
-    if (path[i].tagName === 'BODY') {
+    if (path[i].tagName === "BODY") {
       return path.slice(0, i + 1)
     }
   }
 }
 
-function get_Path_To_Nearest_Class_or_Id (path) {
+function get_Path_To_Nearest_Class_or_Id(path) {
   // `get index of body, ignore window , document shadow etc
   let length = path.length
   for (let i = 0; i < length; i++) {
@@ -525,12 +518,11 @@ function get_Path_To_Nearest_Class_or_Id (path) {
 
 // open the recorder if user specifies
 var testRecorder: TestRecorder
-if (Settings.get().keepOpen) {
-  console.log("opening test recorder automatically")
-  console.log(Settings.get())
+if (localSettings.get().keepOpen) {
+  console.log(localSettings.get())
   testRecorder = new TestRecorder()
 }
-``
+;``
 // chrome extension handler
 declare var chrome: any
 
@@ -549,16 +541,15 @@ window.addEventListener("message", function(event) {
 
 setTimeout(() => {
   if (chrome && chrome.runtime && chrome.runtime.onMessage) {
-    chrome.runtime.onMessage.addListener(
-      function () {
-        if (!testRecorder) {
-          console.log("Extension button click opening test recorder")
-          testRecorder = new TestRecorder()
-          return
-        }
-        console.log("Extension button clicked closing already open test recorder")
-        testRecorder.destroy()
-        testRecorder = null
-      })
+    chrome.runtime.onMessage.addListener(function() {
+      if (!testRecorder) {
+        console.log("Extension button click opening test recorder")
+        testRecorder = new TestRecorder()
+        return
+      }
+      console.log("Extension button clicked closing already open test recorder")
+      testRecorder.destroy()
+      testRecorder = null
+    })
   }
 }, 2100)

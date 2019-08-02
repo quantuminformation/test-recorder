@@ -1,4 +1,3 @@
-
 #testRecorderUI {
   position: fixed !important;
   bottom: 10px;
@@ -16,25 +15,27 @@
   transition: all 100ms ease;
 
   .header {
-    background-color: rgba(204, 250, 255, 0.9) !important;
+    background-color: rgba(20, 22, 27, 0.9) !important;
     padding: 2px !important;
     line-height: 18px !important;
     text-align: center !important;
     position: fixed !important;
   }
 
-  select, button {
+  select,
+  button {
     padding: 1px !important;
     margin: 1px !important;
     height: 20px !important;
     font-size: 12px;
     max-width: 80px !important;
+    display: inline;
   }
   .header > span {
     cursor: pointer !important;
     font-size: 16px !important;
     padding: 4px !important;
-    &:hover{
+    &:hover {
       background-color: #0b97c4;
     }
   }
@@ -47,5 +48,11 @@
       background-color: initial !important;
       overflow: visible !important;
     }
+  }
+}
+.solar-popup {
+  input[type="checkbox"] {
+    /* make sure leaking styles don't kill the checkboxes */
+    appearance: checkbox;
   }
 }
