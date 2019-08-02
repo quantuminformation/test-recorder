@@ -29,6 +29,7 @@
     height: 20px !important;
     font-size: 12px;
     max-width: 80px !important;
+    display: inline;
   }
   .header > span {
     cursor: pointer !important;
@@ -47,5 +48,11 @@
       background-color: initial !important;
       overflow: visible !important;
     }
+  }
+}
+.solar-popup {
+  input[type="checkbox"] {
+    /* make sure leaking styles don't kill the checkboxes */
+    appearance: checkbox;
   }
 }

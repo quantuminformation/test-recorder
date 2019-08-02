@@ -3,9 +3,9 @@ import { localSettings } from "../LocalSettings"
 import { SolarPopup } from "solar-popup"
 import { TestRecorder } from "../TestRecorder"
 
-export class SettingsPopup  {
+export class SettingsPopup {
   hostElement: HTMLElement = document.createElement("div")
-  constructor() {
+  constructor(public onSubmit: () => void) {
     const { hostElement } = this
 
     // language=HTML
@@ -55,7 +55,7 @@ export class SettingsPopup  {
       }
       localSettings.saveAll(settings)
 
-
+      this.onSubmit()
     })
   }
   show() {

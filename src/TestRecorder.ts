@@ -12,6 +12,7 @@ import { UserEvent } from "./util/UserEvent"
 import { SolarPopup } from "solar-popup"
 import { localSettings } from "./LocalSettings"
 import PathTools, { getPath, isElementClassOrChildOfClass } from "./util/PathTools"
+import { SettingsPopup } from "./components/SettingsPopup"
 
 declare let require
 
@@ -69,7 +70,7 @@ export class TestRecorder {
           <span id="debug">&#x1F41B;</span>
           <button id="copy">Copy</button>
            <span class="info" >&#x1F3F7;</span>
-          <span class="settings" >&#x2699;</span>
+          <span class="settingsTR" >&#x2699;</span>
           <select id="framework-choice">
             ${Array.from(this.codeGenerators.keys())
               .map(
@@ -103,7 +104,7 @@ export class TestRecorder {
       }
     }
     this.updateFontSize()
-    console.log('Test recorder setup successfully')
+    console.log("Test recorder setup successfully")
   }
 
   updateFontSize() {
@@ -127,63 +128,13 @@ export class TestRecorder {
     document.querySelector(".info").addEventListener("click", () => {
       alert(`Version: ${require("../package.json").version}`)
     })
-    document.querySelector(".settings").addEventListener("click", () => {
+    document.querySelector(".settingsTR").addEventListener("click", () => {
       let el = document.createElement("div")
 
-      // language=HTML
-      el.innerHTML = `
-        <h3>Test Recorder settings</h3>
-        <p>This stores the settings in your local storage for the current web URL</p>
-        <form>
-        <ul>
-          <li title="By default only elements with id's or data-test* attributes are recorded">
-            Record all elements<input name="recordAll" type="checkbox" ${
-              localSettings.get().recordAll ? "checked" : ""
-            }>
-          </li>
-          <li title="Useful for page refreshes">
-            Persist code<input name="persistCode" type="checkbox" ${
-              localSettings.get().persistCode ? "checked" : ""
-            }>
-          </li>
-          <li title="Opens on page refreshes">
-            Keep recorder open<input name="keepOpen" type="checkbox" ${
-              localSettings.get().keepOpen ? "checked" : ""
-            }>
-          <li title="The size of the generated code in pixels">
-            Code size px<input name="codeFontSize" type="number" value="${
-              localSettings.get().codeFontSizePx ? localSettings.get().codeFontSizePx : 10
-            }">
-          </li>
-          </li>
-         <!-- <li title="Records form values for auto population">
-            Monkey Mode<input name="monkeyMode" type="checkbox" ${
-              localSettings.get().monkeyMode ? "checked" : ""
-            }>
-            <button name=clearMonkeyMode>Clear saved values</button>
-          </li>-->
-          </ul>
-          <button>Save</button>
-        </form>
-      `
+      let settingsPopup = new SettingsPopup(this.updateFontSize)
+      settingsPopup.show()
 
-      el.addEventListener("submit", e => {
-        let settings = {
-          recordAll: (<HTMLInputElement>el.querySelector('[name="recordAll"]')).checked,
-          keepOpen: (<HTMLInputElement>el.querySelector('[name="keepOpen"]')).checked,
-          persistCode: (<HTMLInputElement>el.querySelector('[name="persistCode"]')).checked,
-     //     monkeyMode: (<HTMLInputElement>el.querySelector('[name="monkeyMode"]')).checked,
-          codeFontSize: (<HTMLInputElement>el.querySelector('[name="codeFontSize"]')).value
-        }
-        localSettings.saveAll(settings)
-
-        // update UI
-        this.updateFontSize()
-      })
-      let popup = new SolarPopup(el)
-      popup.hostElement.classList.add(TestRecorder.DO_NOT_RECORD)
-      popup.show()
-      document.querySelector('.modal-background').classList.add(TestRecorder.DO_NOT_RECORD)
+      document.querySelector(".modal-background").classList.add(TestRecorder.DO_NOT_RECORD)
     })
     document.querySelector(".minimise").addEventListener("click", () => {
       this.hostElement.style.height = "40px"
