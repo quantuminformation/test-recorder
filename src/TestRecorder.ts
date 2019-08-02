@@ -6,7 +6,7 @@ import { copyTextToClipboard } from "./util/clipboard"
 //import  'prismjs/components/prism-javascript'
 import { ICodeGenerator } from "./codeGenerators/ICodeGenerator"
 import { EmberCLIGenerator } from "./codeGenerators/EmberCLIGenerator"
-import { CypressGenerator } from "./codeGenerators/Chromeless"
+import { CypressGenerator } from "./codeGenerators/Cypress"
 import { MutationEntry } from "./util/MutationEntry"
 import { UserEvent } from "./util/UserEvent"
 import { SolarPopup } from "solar-popup"
@@ -304,8 +304,6 @@ export class TestRecorder {
       localSettings.saveItem("generatedTestCode", "")
     }
 
-    //todo get prism to work
-    // Prism.highlightAll()
   }
 
   /*  window.addEventListener("hashchange", function (e) {

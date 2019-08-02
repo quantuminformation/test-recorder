@@ -1,16 +1,13 @@
-import formattingRules from "../util/formattingRules"
 import { TestRecorder } from "../TestRecorder"
 import { ICodeGenerator } from "./ICodeGenerator"
 import { MutationEntry } from "../util/MutationEntry"
 import { UserEvent } from "../util/UserEvent"
 
-//todo, not sure if this is worthwhile since this isn't a test framework
 export class CypressGenerator implements ICodeGenerator {
   lastRoute: string = ""
-  description: string = "Chromeless"
+  description: string = "Cypress"
 
   constructor() {
-    // tslint:disable-line
   }
 
   selectChange(queryPath, event: Event): UserEvent {
