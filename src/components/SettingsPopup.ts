@@ -1,9 +1,9 @@
 import { IComponent } from "vanilla-typescript"
 import { localSettings } from "../LocalSettings"
-import { SolarPopup } from "solar-popup/build/src"
+import { SolarPopup } from "solar-popup"
 import { TestRecorder } from "../TestRecorder"
 
-export class SettingsPopup implements IComponent {
+export class SettingsPopup  {
   hostElement: HTMLElement = document.createElement("div")
   constructor() {
     const { hostElement } = this
