@@ -9,6 +9,12 @@ http.createServer(function(request, response) {
   var uri = url.parse(request.url).pathname
     , filename = path.join(process.cwd()+'/build', uri) ;
 
+  if (path.normalize(request.url) !== request.url) {
+    response.statusCode = 403;
+    response.end();
+    return;
+  }
+
   var contentTypesByExtension = {
     '.html': "text/html",
     '.css':  "text/css",
